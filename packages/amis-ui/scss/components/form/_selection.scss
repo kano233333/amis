@@ -47,6 +47,7 @@
   padding: var(--gap-xs) 0;
 
   &-group > &-itemLabel {
+    height: px2rem(32px);
     padding: var(--gap-xs) var(--gap-base);
     color: var(--FileControl-icon-color);
   }
@@ -172,8 +173,13 @@
     bottom: 0;
   }
 
-  &-item.is-disabled {
+  &-item.is-disabled > .#{$ns}TreeSelection-itemInner {
+    cursor: not-allowed;
     color: var(--text--muted-color);
+  }
+
+  &-item .#{$ns}TreeSelection-itemLabel {
+    white-space: nowrap;
   }
 
   &-itemInner {

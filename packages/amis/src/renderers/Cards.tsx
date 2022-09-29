@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import {findDOMNode} from 'react-dom';
 import {Renderer, RendererProps} from 'amis-core';
 import {SchemaNode, Schema, ActionObject} from 'amis-core';
-import {Button} from 'amis-ui';
+import {Button, Spinner} from 'amis-ui';
 import {ListStore, IListStore} from 'amis-core';
 import {Action} from '../types';
 import {
@@ -152,6 +152,7 @@ export interface GridProps
   multiple?: boolean;
   valueField?: string;
   draggable?: boolean;
+  dragIcon?: SVGAElement;
   onSelect: (
     selectedItems: Array<object>,
     unSelectedItems: Array<object>
@@ -162,7 +163,10 @@ export interface GridProps
     rowIndexes: Array<number> | number,
     unModifiedItems?: Array<object>,
     rowOrigins?: Array<object> | object,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) => void;
   onSaveOrder?: (moved: Array<object>, items: Array<object>) => void;
   onQuery: (values: object) => void;
@@ -480,12 +484,15 @@ export default class Cards extends React.Component<GridProps, object> {
     item: IItem,
     values: object,
     saveImmediately?: boolean | any,
-    saveSilent?: boolean,
-    resetOnFailed?: boolean
+    savePristine?: boolean,
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) {
-    item.change(values, saveSilent);
+    item.change(values, savePristine);
 
-    if (!saveImmediately || saveSilent) {
+    if (!saveImmediately || savePristine) {
       return;
     }
 
@@ -494,7 +501,8 @@ export default class Cards extends React.Component<GridProps, object> {
         null,
         {
           actionType: 'ajax',
-          api: saveImmediately.api
+          api: saveImmediately.api,
+          reload: options?.reload
         },
         values
       );
@@ -513,7 +521,7 @@ export default class Cards extends React.Component<GridProps, object> {
       item.index,
       undefined,
       item.pristine,
-      resetOnFailed
+      options
     );
   }
 
@@ -617,6 +625,7 @@ export default class Cards extends React.Component<GridProps, object> {
 
   destroyDragging() {
     this.sortable && this.sortable.destroy();
+    this.sortable = undefined;
   }
 
   renderActions(region: string) {
@@ -848,7 +857,14 @@ export default class Cards extends React.Component<GridProps, object> {
   }
 
   renderDragToggler() {
-    const {store, multiple, selectable, env, translate: __} = this.props;
+    const {
+      store,
+      multiple,
+      selectable,
+      env,
+      translate: __,
+      dragIcon
+    } = this.props;
 
     if (!store.draggable || store.items.length < 2) {
       return null;
@@ -868,9 +884,14 @@ export default class Cards extends React.Component<GridProps, object> {
           e.preventDefault();
           store.toggleDragging();
           store.dragging && store.clear();
+          store.dragging ? this.initDragging() : undefined;
         }}
       >
-        <Icon icon="exchange" className="icon r90" />
+        {React.isValidElement(dragIcon) ? (
+          dragIcon
+        ) : (
+          <Icon icon="exchange" className="icon r90" />
+        )}
       </Button>
     );
   }
@@ -904,16 +925,17 @@ export default class Cards extends React.Component<GridProps, object> {
       className: cx((card && card.className) || '', {
         'is-checked': item.checked,
         'is-modified': item.modified,
-        'is-moved': item.moved
+        'is-moved': item.moved,
+        'is-dragging': store.dragging
       }),
       item,
+      key: index,
       itemIndex: item.index,
       multiple,
       selectable: store.selectable,
       checkable: item.checkable,
       draggable: item.draggable,
       selected: item.checked,
-      onSelect: this.handleCheck,
       dragging: store.dragging,
       data: item.locals,
       onAction: this.handleAction,
@@ -962,7 +984,8 @@ export default class Cards extends React.Component<GridProps, object> {
       masonryLayout,
       itemsClassName,
       classnames: cx,
-      translate: __
+      translate: __,
+      loading = false
     } = this.props;
 
     this.renderedToolbars = []; // 用来记录哪些 toolbar 已经渲染了，已经渲染了就不重复渲染了。
@@ -1021,6 +1044,7 @@ export default class Cards extends React.Component<GridProps, object> {
         )}
 
         {footer}
+        <Spinner overlay show={loading} />
       </div>
     );
   }

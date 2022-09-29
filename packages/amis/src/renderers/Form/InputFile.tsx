@@ -1,11 +1,16 @@
 import React from 'react';
-import {FormItem, FormControlProps, FormBaseControl} from 'amis-core';
+import {FormItem, FormControlProps, prettyBytes} from 'amis-core';
 import find from 'lodash/find';
 import isPlainObject from 'lodash/isPlainObject';
-import ImageControl from './InputImage';
 import {Payload, ApiObject, ApiString, ActionObject} from 'amis-core';
 import {qsstringify, createObject, guid, isEmpty} from 'amis-core';
-import {buildApi, isEffectiveApi, normalizeApi, isApiOutdated} from 'amis-core';
+import {
+  buildApi,
+  isEffectiveApi,
+  normalizeApi,
+  isApiOutdated,
+  isApiOutdatedWithData
+} from 'amis-core';
 import {Icon} from 'amis-ui';
 import {TooltipWrapper, Button} from 'amis-ui';
 import DropZone from 'react-dropzone';
@@ -15,8 +20,7 @@ import {
   FormBaseControlSchema,
   SchemaApi,
   SchemaClassName,
-  SchemaTokenizeableString,
-  SchemaUrlPath
+  SchemaTokenizeableString
 } from '../../Schema';
 import merge from 'lodash/merge';
 import omit from 'lodash/omit';
@@ -186,6 +190,11 @@ export interface FileControlSchema extends FormBaseControlSchema {
   };
 
   /**
+   * 初始化时是否把其他字段同步到表单内部。
+   */
+  initAutoFill?: boolean;
+
+  /**
    * 接口返回的数据中，哪个用来当做值
    */
   valueField?: string;
@@ -313,6 +322,7 @@ export default class FileControl extends React.Component<FileProps, FileState> {
     multiple: false,
     autoUpload: true,
     hideUploadButton: false,
+    initAutoFill: true,
     stateTextMap: {
       init: '',
       pending: '等待上传',
@@ -333,6 +343,7 @@ export default class FileControl extends React.Component<FileProps, FileState> {
     file: any;
     executor: () => void;
   }> = [];
+  initAutoFill: boolean;
 
   static valueToFile(
     value: string | FileValue,
@@ -382,6 +393,7 @@ export default class FileControl extends React.Component<FileProps, FileState> {
     const joinValues = props.joinValues;
     const delimiter = props.delimiter as string;
     let files: Array<FileValue> = [];
+    this.initAutoFill = !!props.initAutoFill;
 
     if (value && value instanceof Blob) {
       files = [value as any];
@@ -421,7 +433,12 @@ export default class FileControl extends React.Component<FileProps, FileState> {
   }
 
   componentDidMount() {
-    this.syncAutoFill();
+    if (this.initAutoFill) {
+      const {formInited, addHook} = this.props;
+      formInited || !addHook
+        ? this.syncAutoFill()
+        : addHook(this.syncAutoFill, 'init');
+    }
   }
 
   componentDidUpdate(prevProps: FileProps) {
@@ -472,7 +489,7 @@ export default class FileControl extends React.Component<FileProps, FileState> {
         {
           files: files
         },
-        this.syncAutoFill
+        props.formInited !== false ? this.syncAutoFill : undefined
       );
     }
   }
@@ -496,8 +513,8 @@ export default class FileControl extends React.Component<FileProps, FileState> {
         // this.props.env.alert(
         //   __('File.maxSize', {
         //     filename: file[nameField as keyof typeof file] || file.name,
-        //     actualSize: ImageControl.formatFileSize(file.size),
-        //     maxSize: ImageControl.formatFileSize(maxSize)
+        //     actualSize: prettyBytes(file.size),
+        //     maxSize: prettyBytes(maxSize)
         //   })
         // );
         file.state = 'invalid';
@@ -573,14 +590,16 @@ export default class FileControl extends React.Component<FileProps, FileState> {
       file[urlField as keyof typeof file] ||
       file[valueField as keyof typeof file];
 
-    let api =
-      typeof downloadUrl === 'string' && !~downloadUrl.indexOf('$')
+    const api =
+      typeof downloadUrl === 'string' &&
+      !~downloadUrl.indexOf('$') &&
+      typeof fileUrl === 'string'
         ? `${downloadUrl}${fileUrl}`
         : downloadUrl
         ? downloadUrl
-        : `${fileUrl}`;
+        : undefined;
 
-    this.handleApi(api, file);
+    api && this.handleApi(api, file);
   }
 
   downloadTpl(e: React.MouseEvent) {
@@ -729,8 +748,8 @@ export default class FileControl extends React.Component<FileProps, FileState> {
         {
           uploading: false
         },
-        () => {
-          this.onChange(!!this.resolve);
+        async () => {
+          await this.onChange(!!this.resolve);
 
           if (this.resolve) {
             this.resolve(
@@ -924,6 +943,10 @@ export default class FileControl extends React.Component<FileProps, FileState> {
 
   syncAutoFill() {
     const {autoFill, multiple, onBulkChange, data, name} = this.props;
+    // 参照录入｜自动填充
+    if (autoFill?.hasOwnProperty('api')) {
+      return;
+    }
     // 排除自身的字段，否则会无限更新state
     const excludeSelfAutoFill = omit(autoFill, name || '');
 
@@ -933,11 +956,14 @@ export default class FileControl extends React.Component<FileProps, FileState> {
       );
       const toSync = dataMapping(
         excludeSelfAutoFill,
-        multiple
-          ? {
-              items: files
-            }
-          : files[0]
+        createObject(
+          data,
+          multiple
+            ? {
+                items: files
+              }
+            : files[0]
+        )
       );
       Object.keys(toSync).forEach(key => {
         if (isPlainObject(toSync[key]) && isPlainObject(data[key])) {
@@ -1126,8 +1152,13 @@ export default class FileControl extends React.Component<FileProps, FileState> {
           fd.append(config.fieldName || 'file', blob, file.name);
 
           return self
-            ._send(file, api, fd, {}, progress =>
-              updateProgress(task.partNumber, progress)
+            ._send(
+              file,
+              api,
+              fd,
+              {},
+              progress => updateProgress(task.partNumber, progress),
+              3
             )
             .then(ret => {
               state.loaded++;
@@ -1166,35 +1197,57 @@ export default class FileControl extends React.Component<FileProps, FileState> {
     });
   }
 
-  _send(
+  async _send(
     file: FileX,
     api: ApiObject | ApiString,
     data?: any,
     options?: object,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
+    maxRetryLimit = 0
   ): Promise<Payload> {
     const env = this.props.env;
+    const __ = this.props.translate;
 
     if (!env || !env.fetcher) {
       throw new Error('fetcher is required');
     }
 
-    return env.fetcher(api, data, {
-      method: 'post',
-      ...options,
-      withCredentials: true,
-      cancelExecutor: (cancelExecutor: () => void) => {
-        // 记录取消器，取消的时候要调用
-        this.fileUploadCancelExecutors.push({
-          file: file,
-          executor: cancelExecutor
-        });
-      },
-      onUploadProgress: onProgress
-        ? (event: {loaded: number; total: number}) =>
-            onProgress(event.loaded / event.total)
-        : undefined
-    });
+    try {
+      const result = await env.fetcher(api, data, {
+        method: 'post',
+        ...options,
+        withCredentials: true,
+        cancelExecutor: (cancelExecutor: () => void) => {
+          // 记录取消器，取消的时候要调用
+          this.fileUploadCancelExecutors.push({
+            file: file,
+            executor: cancelExecutor
+          });
+        },
+        onUploadProgress: onProgress
+          ? (event: {loaded: number; total: number}) =>
+              onProgress(event.loaded / event.total)
+          : undefined
+      });
+
+      if (!result.ok) {
+        throw new Error(result.msg || __('File.errorRetry'));
+      }
+
+      return result;
+    } catch (error) {
+      if (maxRetryLimit > 0) {
+        return this._send(
+          file,
+          api,
+          data,
+          options,
+          onProgress,
+          maxRetryLimit - 1
+        );
+      }
+      throw error;
+    }
   }
 
   removeFileCanelExecutor(file: any, execute = false) {
@@ -1354,7 +1407,9 @@ export default class FileControl extends React.Component<FileProps, FileState> {
                   </div>
                   {maxSize ? (
                     <div className={cx('FileControl-sizeTip')}>
-                      {__('File.sizeLimit', {maxSize})}
+                      {__('File.sizeLimit', {
+                        maxSize: prettyBytes(maxSize, 1024)
+                      })}
                     </div>
                   ) : null}
                 </div>
@@ -1401,7 +1456,7 @@ export default class FileControl extends React.Component<FileProps, FileState> {
 
         {maxSize && !drag ? (
           <div className={cx('FileControl-sizeTip')}>
-            {__('File.sizeLimit', {maxSize})}
+            {__('File.sizeLimit', {maxSize: prettyBytes(maxSize, 1024)})}
           </div>
         ) : null}
 
@@ -1423,10 +1478,8 @@ export default class FileControl extends React.Component<FileProps, FileState> {
                           (maxSize && file.size > maxSize
                             ? __('File.maxSize', {
                                 filename: file.name,
-                                actualSize: ImageControl.formatFileSize(
-                                  file.size
-                                ),
-                                maxSize: ImageControl.formatFileSize(maxSize)
+                                actualSize: prettyBytes(file.size, 1024),
+                                maxSize: prettyBytes(maxSize, 1024)
                               })
                             : '')
                         : ''
@@ -1521,11 +1574,17 @@ export default class FileControl extends React.Component<FileProps, FileState> {
   renderDescription: false,
   shouldComponentUpdate: (props: any, prevProps: any) =>
     !!isEffectiveApi(props.receiver, props.data) &&
-    isApiOutdated(
+    (isApiOutdated(
       props.receiver,
       prevProps.receiver,
       props.data,
       prevProps.data
-    )
+    ) ||
+      isApiOutdatedWithData(
+        props.receiver,
+        prevProps.receiver,
+        props.data,
+        prevProps.data
+      ))
 })
 export class FileControlRenderer extends FileControl {}

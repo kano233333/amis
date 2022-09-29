@@ -86,6 +86,13 @@ export interface BasicPaginationProps {
   disabled?: boolean;
 
   hasNext?: boolean;
+
+  /**
+   * 弹层挂载节点
+   * @default false
+   */
+  popOverContainerSelector?: string;
+
   onPageChange?: (page: number, perPage?: number) => void;
 }
 export interface PaginationProps
@@ -136,7 +143,7 @@ export class Pagination extends React.Component<
     if (disabled) {
       return;
     }
-    onPageChange?.(page, perPage);
+    onPageChange?.(isNaN(Number(page)) || Number(page) < 1 ? 1 : page, perPage);
   }
 
   /**
@@ -257,6 +264,7 @@ export class Pagination extends React.Component<
       className,
       disabled,
       hasNext,
+      popOverContainerSelector,
       translate: __
     } = this.props;
     const {pageNum, perPage} = this.state;
@@ -470,11 +478,11 @@ export class Pagination extends React.Component<
       <Select
         key="perpage"
         className={cx('Pagination-perpage', 'Pagination-item')}
-        overlayPlacement="right-bottom-right-top"
         clearable={false}
         disabled={disabled}
         value={perPage}
         options={selection}
+        popOverContainerSelector={popOverContainerSelector}
         onChange={(p: any) => {
           this.setState({
             perPage: p.value,

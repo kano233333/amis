@@ -8,6 +8,9 @@ import padStart from 'lodash/padStart';
 import capitalize from 'lodash/capitalize';
 import escape from 'lodash/escape';
 import truncate from 'lodash/truncate';
+import uniqWith from 'lodash/uniqWith';
+import uniqBy from 'lodash/uniqBy';
+import isEqual from 'lodash/isEqual';
 import {EvaluatorOptions, FilterContext, FilterMap, FunctionMap} from './types';
 
 export class Evaluator {
@@ -103,7 +106,7 @@ export class Evaluator {
       const filter = filters.shift()!;
       const fn = this.filters[filter.name];
       if (!fn) {
-        throw new Error(`filter \`${filter.name}\` not exits`);
+        throw new Error(`filter \`${filter.name}\` not exists.`);
       }
       context.filter = filter;
       input = fn.apply(
@@ -227,6 +230,10 @@ export class Evaluator {
   add(ast: {left: any; right: any}) {
     const left = this.evalute(ast.left);
     const right = this.evalute(ast.right);
+    // 如果有一个不是数字就变成字符串拼接
+    if (isNaN(left) || isNaN(right)) {
+      return left + right;
+    }
     return stripNumber(this.formatNumber(left) + this.formatNumber(right));
   }
 
@@ -535,7 +542,7 @@ export class Evaluator {
   }
 
   /**
-   * 异或处理，两个表达式同时为「真」，或者同时为「假」，则结果返回为「真」
+   * 异或处理，多个表达式组中存在奇数个真时认为真。
    *
    * @example XOR(condition1, condition2)
    * @param {expression} condition1 - 条件表达式1
@@ -544,8 +551,8 @@ export class Evaluator {
    *
    * @returns {boolean}
    */
-  fnXOR(c1: () => any, c2: () => any) {
-    return !!c1() === !!c2();
+  fnXOR(...condtions: Array<() => any>) {
+    return !!(condtions.filter(c => c()).length % 2);
   }
 
   /**
@@ -600,10 +607,7 @@ export class Evaluator {
    * @returns {number} 所有传入值中最大的那个
    */
   fnMAX(...args: Array<any>) {
-    let arr = args;
-    if (args.length === 1 && Array.isArray(args[0])) {
-      arr = args[0];
-    }
+    const arr = normalizeArgs(args);
     return Math.max.apply(
       Math,
       arr.map(item => this.formatNumber(item))
@@ -620,10 +624,7 @@ export class Evaluator {
    * @returns {number} 所有传入值中最小的那个
    */
   fnMIN(...args: Array<number>) {
-    let arr = args;
-    if (args.length === 1 && Array.isArray(args[0])) {
-      arr = args[0];
-    }
+    const arr = normalizeArgs(args);
     return Math.min.apply(
       Math,
       arr.map(item => this.formatNumber(item))
@@ -640,10 +641,7 @@ export class Evaluator {
    * @returns {number} 所有传入数值的总和
    */
   fnSUM(...args: Array<number>) {
-    let arr = args;
-    if (args.length === 1 && Array.isArray(args[0])) {
-      arr = args[0];
-    }
+    const arr = normalizeArgs(args);
     return arr.reduce((sum, a) => sum + this.formatNumber(a) || 0, 0);
   }
 
@@ -696,7 +694,7 @@ export class Evaluator {
    *
    * @returns {number} 传入数值四舍五入后的结果
    */
-  fnROUND(a: number, b: number) {
+  fnROUND(a: number, b: number = 2) {
     a = this.formatNumber(a);
     b = this.formatNumber(b);
     const bResult = Math.round(b);
@@ -719,7 +717,7 @@ export class Evaluator {
    *
    * @returns {number} 传入数值向下取整后的结果
    */
-  fnFLOOR(a: number, b: number) {
+  fnFLOOR(a: number, b: number = 2) {
     a = this.formatNumber(a);
     b = this.formatNumber(b);
     const bResult = Math.round(b);
@@ -742,7 +740,7 @@ export class Evaluator {
    *
    * @returns {number} 传入数值向上取整后的结果
    */
-  fnCEIL(a: number, b: number) {
+  fnCEIL(a: number, b: number = 2) {
     a = this.formatNumber(a);
     b = this.formatNumber(b);
     const bResult = Math.round(b);
@@ -778,10 +776,7 @@ export class Evaluator {
    * @returns {number} 所有数值的平均值
    */
   fnAVG(...args: Array<any>) {
-    let arr = args;
-    if (args.length === 1 && Array.isArray(args[0])) {
-      arr = args[0];
-    }
+    const arr = normalizeArgs(args);
     return (
       this.fnSUM.apply(
         this,
@@ -803,10 +798,7 @@ export class Evaluator {
     if (args.length === 0) {
       return null;
     }
-    let arr = args;
-    if (args.length === 1 && Array.isArray(args[0])) {
-      arr = args[0];
-    }
+    const arr = normalizeArgs(args);
 
     const nums = arr.map(item => this.formatNumber(item));
     const sum = nums.reduce((sum, a) => sum + a || 0, 0);
@@ -904,10 +896,15 @@ export class Evaluator {
    */
   fnUPPERMONEY(n: number) {
     n = this.formatNumber(n);
+    const maxLen = 14;
+    if (n.toString().split('.')[0]?.length > maxLen) {
+      return `最大数额只支持到兆(既小数点前${maxLen}位)`;
+    }
+
     const fraction = ['角', '分'];
     const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
     const unit = [
-      ['元', '万', '亿'],
+      ['元', '万', '亿', '兆'],
       ['', '拾', '佰', '仟']
     ];
     const head = n < 0 ? '欠' : '';
@@ -1453,6 +1450,7 @@ export class Evaluator {
    * 返回时间的时间戳
    *
    * @example TIMESTAMP(date[, format = "X"])
+   * @example TIMESTAMP(date, 'x')
    * @namespace 日期函数
    * @param {date} date 日期对象
    * @param {string} format 时间戳格式，带毫秒传入 'x'。默认为 'X' 不带毫秒的。
@@ -1491,6 +1489,7 @@ export class Evaluator {
    * 将日期转成日期字符串
    *
    * @example DATETOSTR(date[, format="YYYY-MM-DD HH:mm:ss"])
+   * @example DATETOSTR(date, 'YYYY-MM-DD')
    * @namespace 日期函数
    * @param {date} date 日期对象
    * @param {string} format 日期格式，默认为 "YYYY-MM-DD HH:mm:ss"
@@ -1531,8 +1530,12 @@ export class Evaluator {
   }
 
   normalizeDate(raw: any): Date {
+    if (typeof raw === 'number' || !isNaN(raw)) {
+      return new Date(Number(raw));
+    }
+
     if (typeof raw === 'string') {
-      const formats = ['', 'YYYY-MM-DD HH:mm:ss'];
+      const formats = ['', 'YYYY-MM-DD HH:mm:ss', 'X'];
 
       while (formats.length) {
         const format = formats.shift()!;
@@ -1542,8 +1545,6 @@ export class Evaluator {
           return date.toDate();
         }
       }
-    } else if (typeof raw === 'number') {
-      return new Date(raw);
     }
 
     return raw;
@@ -1841,7 +1842,7 @@ export class Evaluator {
    *
    * 示例：
    *
-   * JOIN(['a', 'b', 'c'], '~') 得到 'a~b~c'
+   * JOIN(['a', 'b', 'c'], '=') 得到 'a=b=c'
    *
    * @param {Array<any>} arr 数组
    * @param { String} separator 分隔符
@@ -1855,6 +1856,43 @@ export class Evaluator {
     } else {
       return '';
     }
+  }
+
+  /**
+   * 数组合并
+   *
+   * 示例：
+   *
+   * CONCAT(['a', 'b', 'c'], ['1'], ['3']) 得到 ['a', 'b', 'c', '1', '3']
+   *
+   * @param {Array<any>} arr 数组
+   * @namespace 数组
+   * @example CONCAT(['a', 'b', 'c'], ['1'], ['3'])
+   * @returns {Array<any>} 结果
+   */
+  fnCONCAT(...arr: any[]) {
+    if (arr?.[0] && !Array.isArray(arr[0])) {
+      arr[0] = [arr[0]];
+    }
+    return arr.reduce((a, b) => a.concat(b), []).filter((item: any) => item);
+  }
+
+  /**
+   * 数组去重，第二个参数「field」，可指定根据该字段去重
+   *
+   * 示例：
+   *
+   * UNIQ([{a: '1'}, {b: '2'}, {a: '1'}]， 'id')
+   *
+   * @param {Array<any>} arr 数组
+   * @param {string} field 字段
+   * @namespace 数组
+   * @example UNIQ([{a: '1'}, {b: '2'}, {a: '1'}])
+   * @example UNIQ([{a: '1'}, {b: '2'}, {a: '1'}], 'x')
+   * @returns {Array<any>} 结果
+   */
+  fnUNIQ(arr: any[], field?: string) {
+    return field ? uniqBy(arr, field) : uniqWith(arr, isEqual);
   }
 }
 
@@ -1876,11 +1914,20 @@ function parseJson(str: string, defaultValue?: any) {
 }
 
 function stripNumber(number: number) {
-  if (typeof number === 'number') {
+  if (typeof number === 'number' && !Number.isInteger(number)) {
     return parseFloat(number.toPrecision(12));
   } else {
     return number;
   }
+}
+
+// 如果只有一个成员，同时第一个成员为 args
+// 则把它展开，当成是多个参数，毕竟公式里面还不支持 ...args 语法，
+function normalizeArgs(args: Array<any>) {
+  if (args.length === 1 && Array.isArray(args[0])) {
+    args = args[0];
+  }
+  return args;
 }
 
 export function createObject(

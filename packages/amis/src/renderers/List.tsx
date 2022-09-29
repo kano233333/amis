@@ -4,7 +4,7 @@ import {Renderer, RendererProps} from 'amis-core';
 import {SchemaNode, Schema, ActionObject} from 'amis-core';
 import {filter} from 'amis-core';
 import cx from 'classnames';
-import {Button} from 'amis-ui';
+import {Button, Spinner} from 'amis-ui';
 import {Checkbox} from 'amis-ui';
 import {ListStore, IListStore} from 'amis-core';
 import {observer} from 'mobx-react';
@@ -246,7 +246,10 @@ export interface ListProps
     rowIndexes: Array<number> | number,
     unModifiedItems?: Array<object>,
     rowOrigins?: Array<object> | object,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) => void;
   onSaveOrder?: (moved: Array<object>, items: Array<object>) => void;
   onQuery: (values: object) => void;
@@ -492,7 +495,10 @@ export default class List extends React.Component<ListProps, object> {
     values: object,
     saveImmediately?: boolean | any,
     savePristine?: boolean,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) {
     item.change(values, savePristine);
 
@@ -505,7 +511,8 @@ export default class List extends React.Component<ListProps, object> {
         null,
         {
           actionType: 'ajax',
-          api: saveImmediately.api
+          api: saveImmediately.api,
+          reload: options?.reload
         },
         values
       );
@@ -524,7 +531,7 @@ export default class List extends React.Component<ListProps, object> {
       item.index,
       undefined,
       item.pristine,
-      resetOnFailed
+      options
     );
   }
 
@@ -914,6 +921,57 @@ export default class List extends React.Component<ListProps, object> {
     return void 0;
   }
 
+  // editor重写该方法，不要改名或参数
+  renderListItem(
+    index: number,
+    template: ListItemSchema | undefined,
+    item: IItem,
+    itemClassName: string
+  ) {
+    const {
+      render,
+      multiple,
+      store,
+      onAction,
+      hideCheckToggler,
+      checkOnItemClick,
+      itemAction,
+      classnames: cx,
+      translate: __
+    } = this.props;
+
+    return render(
+      `${index}`,
+      {
+        type: 'list-item',
+        ...template
+      },
+      {
+        key: item.index,
+        className: cx(itemClassName, {
+          'is-checked': item.checked,
+          'is-modified': item.modified,
+          'is-moved': item.moved
+        }),
+        selectable: store.selectable,
+        checkable: item.checkable,
+        multiple,
+        item,
+        itemIndex: item.index,
+        hideCheckToggler,
+        checkOnItemClick,
+        itemAction,
+        selected: item.checked,
+        onCheck: this.handleCheck,
+        dragging: store.dragging,
+        onAction,
+        data: item.locals,
+        onQuickChange: store.dragging ? null : this.handleQuickChange,
+        popOverContainer: this.getPopOverContainer
+      }
+    );
+  }
+
   render() {
     const {
       className,
@@ -930,7 +988,8 @@ export default class List extends React.Component<ListProps, object> {
       affixHeader,
       classnames: cx,
       size,
-      translate: __
+      translate: __,
+      loading = false
     } = this.props;
 
     this.renderedToolbars = [];
@@ -957,36 +1016,7 @@ export default class List extends React.Component<ListProps, object> {
         {store.items.length ? (
           <div className={cx('List-items')}>
             {store.items.map((item, index) =>
-              render(
-                `${index}`,
-                {
-                  type: 'list-item',
-                  ...listItem
-                },
-                {
-                  key: item.index,
-                  className: cx(itemClassName, {
-                    'is-checked': item.checked,
-                    'is-modified': item.modified,
-                    'is-moved': item.moved
-                  }),
-                  selectable: store.selectable,
-                  checkable: item.checkable,
-                  multiple,
-                  item,
-                  itemIndex: item.index,
-                  hideCheckToggler,
-                  checkOnItemClick,
-                  itemAction,
-                  selected: item.checked,
-                  onCheck: this.handleCheck,
-                  dragging: store.dragging,
-                  onAction,
-                  data: item.locals,
-                  onQuickChange: store.dragging ? null : this.handleQuickChange,
-                  popOverContainer: this.getPopOverContainer
-                }
-              )
+              this.renderListItem(index, listItem, item, itemClassName)
             )}
           </div>
         ) : (
@@ -996,6 +1026,7 @@ export default class List extends React.Component<ListProps, object> {
         )}
 
         {this.renderFooter()}
+        <Spinner overlay show={loading} />
       </div>
     );
   }
@@ -1077,11 +1108,14 @@ export class ListItem extends React.Component<ListItemProps> {
     values: object,
     saveImmediately?: boolean,
     savePristine?: boolean,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) {
     const {onQuickChange, item} = this.props;
     onQuickChange &&
-      onQuickChange(item, values, saveImmediately, savePristine, resetOnFailed);
+      onQuickChange(item, values, saveImmediately, savePristine, options);
   }
 
   renderLeft() {

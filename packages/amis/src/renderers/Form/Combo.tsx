@@ -620,6 +620,23 @@ export default class ComboControl extends React.Component<ComboProps> {
       if (!hasDuplicateKey) {
         this.props.onChange(value, submitOnChange, true);
       }
+    } else if (type === 'input-kvs') {
+      // input-kvs 为了避免冲突 key 改成了 _key
+      let hasDuplicateKey = false;
+      const keys: {[key: string]: boolean} = {};
+      for (const item of value) {
+        if ('_key' in item) {
+          if (keys[item._key]) {
+            hasDuplicateKey = true;
+          } else {
+            keys[item._key] = true;
+          }
+        }
+      }
+      // 有重复值就不触发修改，因为 KV 模式下无法支持重复值
+      if (!hasDuplicateKey) {
+        this.props.onChange(value, submitOnChange, true);
+      }
     } else {
       this.props.onChange(value, submitOnChange, true);
     }
@@ -715,7 +732,7 @@ export default class ComboControl extends React.Component<ComboProps> {
     }
   }
 
-  handleAction(action: ActionObject): any {
+  handleAction(e: React.UIEvent<any> | undefined, action: ActionObject): any {
     const {onAction} = this.props;
 
     if (action.actionType === 'delete') {
@@ -728,14 +745,13 @@ export default class ComboControl extends React.Component<ComboProps> {
 
   validate(): any {
     const {
-      value,
       minLength,
       maxLength,
       messages,
       nullable,
       translate: __
     } = this.props;
-
+    const value = this.getValueAsArray();
     if (minLength && (!Array.isArray(value) || value.length < minLength)) {
       return __(
         (messages && messages.minLengthValidateFailed) || 'Combo.minLength',
@@ -1615,3 +1631,10 @@ export class ComboControlRenderer extends ComboControl {
   extendsData: false
 })
 export class KVControlRenderer extends ComboControl {}
+
+@FormItem({
+  type: 'input-kvs',
+  storeType: ComboStore.name,
+  extendsData: false
+})
+export class KVSControlRenderer extends ComboControl {}

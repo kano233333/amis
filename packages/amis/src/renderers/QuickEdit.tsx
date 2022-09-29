@@ -9,8 +9,8 @@ import {RendererProps} from 'amis-core';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 import {ActionObject} from 'amis-core';
 import keycode from 'keycode';
-import {Overlay} from 'amis-ui';
-import {PopOver} from 'amis-ui';
+import {Overlay} from 'amis-core';
+import {PopOver} from 'amis-core';
 import {Icon} from 'amis-ui';
 import {SchemaCollection, SchemaObject} from '../Schema';
 
@@ -28,6 +28,12 @@ export type SchemaQuickEditObject =
        * 接口保存失败后，是否重置组件编辑状态
        */
       resetOnFailed?: boolean;
+
+      /**
+       * 配置刷新目标，默认就会刷新所属 crud 组件，
+       * 如果不需要，请配置为 "none"
+       */
+      reload?: string;
 
       /**
        * 是否直接内嵌
@@ -50,6 +56,12 @@ export type SchemaQuickEditObject =
       resetOnFailed?: boolean;
 
       /**
+       * 配置刷新目标，默认就会刷新所属 crud 组件，
+       * 如果不需要，请配置为 "none"
+       */
+      reload?: string;
+
+      /**
        * 是否直接内嵌
        */
       mode?: 'inline';
@@ -62,6 +74,7 @@ export type SchemaQuickEdit = boolean | SchemaQuickEditObject;
 export interface QuickEditConfig {
   saveImmediately?: boolean;
   resetOnFailed?: boolean;
+  reload?: string;
   mode?: 'inline' | 'dialog' | 'popOver' | 'append';
   type?: string;
   body?: any;
@@ -300,7 +313,7 @@ export const HocQuickEdit =
           values,
           (quickEdit as QuickEditConfig).saveImmediately,
           false,
-          (quickEdit as QuickEditConfig).resetOnFailed
+          quickEdit as QuickEditConfig
         );
 
         return false;
@@ -318,7 +331,7 @@ export const HocQuickEdit =
           values,
           (quickEdit as QuickEditConfig).saveImmediately,
           false,
-          (quickEdit as QuickEditConfig).resetOnFailed
+          quickEdit as QuickEditConfig
         );
       }
 

@@ -35,7 +35,7 @@ import {
 } from '../Schema';
 import {CardsSchema} from './Cards';
 import {ListSchema} from './List';
-import {TableSchema} from './Table';
+import {TableSchema2} from './Table2';
 import {isPureVariable, resolveVariableAndFilter} from 'amis-core';
 import {SchemaCollection} from '../Schema';
 import {upperFirst} from 'lodash';
@@ -51,7 +51,7 @@ export interface CRUD2CommonSchema extends BaseSchema {
   /**
    * 指定内容区的展示模式。
    */
-  mode?: 'table' | 'grid' | 'cards' | /* grid 的别名*/ 'list';
+  mode?: 'table' | 'grid' | 'cards' | /* grid 的别名*/ 'list' | 'table2';
 
   /**
    * 初始化数据 API
@@ -183,8 +183,8 @@ export type CRUD2ListSchema = CRUD2CommonSchema & {
 } & Omit<ListSchema, 'type'>;
 
 export type CRUD2TableSchema = CRUD2CommonSchema & {
-  mode?: 'table';
-} & Omit<TableSchema, 'type'>;
+  mode?: 'table2';
+} & Omit<TableSchema2, 'type'>;
 
 export type CRUD2Schema = CRUD2CardsSchema | CRUD2ListSchema | CRUD2TableSchema;
 
@@ -277,6 +277,13 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
         items: []
       });
     }
+
+    // 自定义列需要用store里的数据同步显示列
+    // 所以需要先初始化一下
+    const {mode, columns} = props;
+    if (mode === 'table2' && columns) {
+      store.updateColumns(columns);
+    }
   }
 
   componentDidMount() {
@@ -301,7 +308,9 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
   componentDidUpdate(prevProps: CRUD2Props) {
     const props = this.props;
     const store = prevProps.store;
-
+    if (prevProps.columns !== props.columns) {
+      store.updateColumns(props.columns);
+    }
     // picker外部引起的值变化处理
     let val: any;
     if (
@@ -524,7 +533,8 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
             perPageField,
             loadDataMode,
             syncResponse2Query,
-            columns: store.columns ?? columns
+            columns: store.columns ?? columns,
+            isTable2: true
           })
           .then(value => {
             interval &&
@@ -592,7 +602,10 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
     indexes: Array<string>,
     unModifiedItems?: Array<any>,
     rowsOrigin?: Array<object> | object,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) {
     const {
       store,
@@ -657,7 +670,7 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
           this.getData(undefined, undefined, true, true);
         })
         .catch(() => {
-          resetOnFailed && this.control.reset();
+          options?.resetOnFailed && this.control.reset();
         });
     }
   }
@@ -838,7 +851,7 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
           oldUnselectedItems.push(item);
         }
 
-        ~idx2 && oldItems.splice(idx2, 1);
+        !~idx && ~idx2 && oldItems.splice(idx2, 1);
       });
 
       newItems = oldItems;
@@ -872,6 +885,7 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
   /**
    * 表格列上的筛选触发
    */
+  @autobind
   handleTableQuery(values: object, forceReload: boolean = false) {
     const {store, syncLocation, env, pageField, perPageField} = this.props;
 
@@ -944,6 +958,27 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
   }
 
   @autobind
+  toggleAllColumns(value: boolean) {
+    const {store} = this.props;
+
+    store.updateColumns(
+      store.columns.map((c: any) => ({...c, toggled: value}))
+    );
+  }
+
+  @autobind
+  toggleToggle(toggled: boolean, index: number) {
+    const {store} = this.props;
+
+    store.updateColumns(
+      store.columns.map((c: any, i: number) => ({
+        ...c,
+        toggled: index === i ? toggled : c.toggled !== false
+      }))
+    );
+  }
+
+  @autobind
   renderChild(region: string, schema: any, props: object = {}) {
     const {render, store} = this.props;
 
@@ -953,7 +988,10 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
       lastPage: store.lastPage,
       perPage: store.perPage,
       total: store.total,
-      onPageChange: this.handleChangePage
+      onPageChange: this.handleChangePage,
+      cols: store.columns, // 和grid的columns属性重复，ColumnsToggler的columns改一下名字 只有用store里的columns
+      toggleAllColumns: this.toggleAllColumns,
+      toggleToggle: this.toggleToggle
       // onAction: onAction
     };
 
@@ -1052,7 +1090,7 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
       filter,
       render,
       store,
-      mode = 'table-v2',
+      mode = 'table2',
       syncLocation,
       children,
       bulkActions,
@@ -1130,13 +1168,15 @@ export default class CRUD2 extends React.Component<CRUD2Props, any> {
             popOverContainer,
             onSave: this.handleSave,
             onSaveOrder: this.handleSaveOrder,
-            onQuery: this.handleTableQuery,
+            onSearch: this.handleTableQuery,
+            onSort: this.handleTableQuery,
             onSelect: this.handleSelect,
-            data: store.mergedData
+            data: store.mergedData,
+            loading: store.loading
           }
         )}
-
-        <Spinner overlay size="lg" key="info" show={store.loading} />
+        {/* spinner可以交给孩子处理 */}
+        {/* <Spinner overlay size="lg" key="info" show={store.loading} /> */}
 
         <div className={cx('Crud2-toolbar')}>
           {this.renderToolbar('footerToolbar', footerToolbar)}

@@ -98,13 +98,13 @@ export interface RenderOptions
 
 export interface fetcherConfig {
   url: string;
-  method?: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'jsonp';
+  method?: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'jsonp' | 'js';
   data?: any;
   config?: any;
 }
 
 const renderers: Array<RendererConfig> = [];
-const renderersMap: {
+export const renderersMap: {
   [propName: string]: boolean;
 } = {};
 const schemaFilters: Array<RenderSchemaFilter> = [];
@@ -370,7 +370,13 @@ export function updateEnv(options: Partial<RenderOptions>, session = 'global') {
 
   let store = stores[options.session || session];
   if (!store) {
-    store = RendererStore.create({}, options);
+    store = RendererStore.create(
+      {},
+      {
+        ...defaultOptions,
+        ...options
+      }
+    );
     stores[options.session || session] = store;
   } else {
     const env = getEnv(store);

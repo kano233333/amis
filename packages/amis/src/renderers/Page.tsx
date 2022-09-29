@@ -40,7 +40,7 @@ import {resolveVariable} from 'amis-core';
 import {buildStyle} from 'amis-core';
 import {PullRefresh} from 'amis-ui';
 import position from 'amis-core';
-import {scrollPosition} from 'amis-core';
+import {scrollPosition, isMobile} from 'amis-core';
 
 /**
  * 样式属性名及值
@@ -284,6 +284,7 @@ export default class Page extends React.Component<PageProps> {
     bulkBindFunctions<Page /*为毛 this 的类型自动识别不出来？*/>(this, [
       'handleAction',
       'handleChange',
+      'handleBulkChange',
       'handleQuery',
       'handleDialogConfirm',
       'handleDialogClose',
@@ -301,7 +302,7 @@ export default class Page extends React.Component<PageProps> {
     this.updateStyle();
 
     this.varStyle = document.createElement('style');
-    this.style.setAttribute('data-vars', '');
+    this.varStyle.setAttribute('data-vars', '');
     document.getElementsByTagName('head')[0].appendChild(this.varStyle);
     this.updateVarStyle();
   }
@@ -419,18 +420,17 @@ export default class Page extends React.Component<PageProps> {
             errorMessage: messages && messages.fetchFailed
           })
           .then(this.initInterval);
-    } else if (
+    }
+    if (
       JSON.stringify(props.css) !== JSON.stringify(prevProps.css) ||
       JSON.stringify(props.mobileCSS) !== JSON.stringify(prevProps.mobileCSS)
     ) {
       this.updateStyle();
-    } else if (
-      JSON.stringify(props.cssVars) !== JSON.stringify(prevProps.cssVars)
-    ) {
+    }
+    if (JSON.stringify(props.cssVars) !== JSON.stringify(prevProps.cssVars)) {
       this.updateVarStyle();
-    } else if (
-      isObjectShallowModified(prevProps.defaultData, props.defaultData)
-    ) {
+    }
+    if (isObjectShallowModified(prevProps.defaultData, props.defaultData)) {
       store.reInitData(props.defaultData);
     }
   }
@@ -651,7 +651,7 @@ export default class Page extends React.Component<PageProps> {
     const {interval, silentPolling, stopAutoRefreshWhen, data, dispatchEvent} =
       this.props;
 
-    if (value.data) {
+    if (value?.data) {
       dispatchEvent('inited', createObject(data, value.data));
     }
 
@@ -688,6 +688,10 @@ export default class Page extends React.Component<PageProps> {
     }
 
     onChange?.apply(null, arguments);
+  }
+
+  handleBulkChange(values: Object) {
+    this.props.store?.updateData?.(values);
   }
 
   renderHeader() {
@@ -782,6 +786,7 @@ export default class Page extends React.Component<PageProps> {
       data,
       asideResizor,
       pullRefresh,
+      useMobileUI,
       translate: __
     } = this.props;
 
@@ -789,6 +794,7 @@ export default class Page extends React.Component<PageProps> {
       onAction: this.handleAction,
       onQuery: initApi ? this.handleQuery : undefined,
       onChange: this.handleChange,
+      onBulkChange: this.handleBulkChange,
       pageLoading: store.loading
     };
 
@@ -857,7 +863,7 @@ export default class Page extends React.Component<PageProps> {
           </div>
         ) : null}
 
-        {pullRefresh && !pullRefresh.disabled ? (
+        {useMobileUI && isMobile() && pullRefresh && !pullRefresh.disabled ? (
           <PullRefresh
             {...pullRefresh}
             translate={__}

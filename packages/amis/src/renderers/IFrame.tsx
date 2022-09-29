@@ -29,6 +29,22 @@ export interface IFrameSchema extends BaseSchema {
 
   width?: number | string;
   height?: number | string;
+
+  allow?: string;
+
+  name?: string;
+
+  referrerpolicy?:
+    | 'no-referrer'
+    | 'no-referrer-when-downgrade'
+    | 'origin'
+    | 'origin-when-cross-origin'
+    | 'same-origin'
+    | 'strict-origin'
+    | 'strict-origin-when-cross-origin'
+    | 'unsafe-url';
+
+  sandbox?: string;
 }
 
 export interface IFrameProps
@@ -145,7 +161,19 @@ export default class IFrame extends React.Component<IFrameProps, object> {
 
   render() {
     const {width, height} = this.state;
-    let {className, src, name, frameBorder, data, style} = this.props;
+    let {
+      className,
+      src,
+      name,
+      frameBorder,
+      data,
+      style,
+      allow,
+      sandbox,
+      referrerpolicy,
+      translate: __,
+      env
+    } = this.props;
 
     let tempStyle: any = {};
 
@@ -166,7 +194,15 @@ export default class IFrame extends React.Component<IFrameProps, object> {
       finalSrc &&
       !/^(\.\/|\.\.\/|\/|https?\:\/\/|\/\/)/.test(finalSrc)
     ) {
-      return <p>请填写合法的 iframe 地址</p>;
+      return <p>{__('Iframe.invalid')}</p>;
+    }
+
+    if (
+      location.protocol === 'https:' &&
+      finalSrc &&
+      finalSrc.startsWith('http://')
+    ) {
+      env.notify('error', __('Iframe.invalidProtocol'));
     }
 
     return (
@@ -178,6 +214,9 @@ export default class IFrame extends React.Component<IFrameProps, object> {
         ref={this.IFrameRef}
         onLoad={this.onLoad}
         src={finalSrc}
+        allow={allow}
+        referrerPolicy={referrerpolicy}
+        sandbox={sandbox}
       />
     );
   }

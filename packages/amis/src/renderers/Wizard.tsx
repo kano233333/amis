@@ -4,6 +4,7 @@ import {Renderer, RendererProps} from 'amis-core';
 import {ServiceStore, IServiceStore} from 'amis-core';
 import {Api, ActionObject} from 'amis-core';
 import {filter, evalExpression} from 'amis-core';
+import {toNumber} from 'amis-core';
 import {
   createObject,
   until,
@@ -259,7 +260,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
           const state = {
             currentStep:
               typeof this.props.startStep === 'string'
-                ? parseInt(tokenize(this.props.startStep, this.props.data))
+                ? toNumber(tokenize(this.props.startStep, this.props.data), 1)
                 : 1
           };
 
@@ -270,7 +271,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
               (typeof value.data.step === 'string' &&
                 /^\d+$/.test(value.data.step)))
           ) {
-            state.currentStep = parseInt(value.data.step, 10);
+            state.currentStep = toNumber(value.data.step, 1);
           }
 
           this.setState(state, () => {
@@ -290,7 +291,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
         {
           currentStep:
             typeof this.props.startStep === 'string'
-              ? parseInt(tokenize(this.props.startStep, this.props.data))
+              ? toNumber(tokenize(this.props.startStep, this.props.data), 1)
               : 1
         },
         () => this.handleInitEvent(store.data)
@@ -467,7 +468,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
               (typeof value.data.step === 'string' &&
                 /^\d+$/.test(value.data.step)))
           ) {
-            state.currentStep = parseInt(value.data.step, 10);
+            state.currentStep = toNumber(value.data.step, 1);
           }
 
           this.setState(state, () => {
@@ -749,6 +750,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
             };
           },
           onFailed: async (error: any) => {
+            store.markSaving(false);
             const dispatcher = await this.dispatchEvent(
               'submitFail',
               createObject(this.props.data, {error})
@@ -809,7 +811,7 @@ export default class Wizard extends React.Component<WizardProps, WizardState> {
 
   // 接管里面 form 的提交，不能直接让 form 提交，因为 wizard 自己需要知道进度。
   @autobind
-  async handleSubmit(values: object, action: ActionObject) {
+  handleSubmit(values: object, action: ActionObject) {
     const {store, steps, finishedField} = this.props;
 
     if (this.state.currentStep < steps.length) {

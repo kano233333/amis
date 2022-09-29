@@ -98,6 +98,7 @@ export class ResultBox extends React.Component<ResultBoxProps> {
   @autobind
   handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {onChange} = this.props;
+
     onChange?.(e.currentTarget.value);
   }
 
@@ -187,6 +188,7 @@ export class ResultBox extends React.Component<ResultBoxProps> {
   }
 
   render() {
+    /** 不需要透传给Input的属性要解构出来 */
     const {
       className,
       classnames: cx,
@@ -214,12 +216,12 @@ export class ResultBox extends React.Component<ResultBoxProps> {
       hasDropDownArrow,
       actions,
       onClear,
+      maxTagCount,
+      overflowTagPopover,
       ...rest
     } = this.props;
     const isFocused = this.state.isFocused;
     const mobileUI = useMobileUI && isMobile();
-    /** 不需要透传给Input的属性 */
-    const omitPropsList = ['maxTagCount', 'overflowTagPopover'];
 
     return (
       <div
@@ -254,15 +256,18 @@ export class ResultBox extends React.Component<ResultBoxProps> {
 
           {allowInput && !disabled ? (
             <Input
-              {...omit(rest, omitPropsList)}
+              {...rest}
               className={cx('ResultBox-value-input')}
               onKeyPress={onKeyPress}
               ref={this.inputRef}
               value={value || ''}
               onChange={this.handleChange}
               placeholder={__(
-                Array.isArray(result) && result.length
-                  ? inputPlaceholder
+                /** 数组模式下输入内容后将不再展示placeholder */
+                Array.isArray(result)
+                  ? result.length > 0
+                    ? inputPlaceholder
+                    : placeholder
                   : result
                   ? ''
                   : placeholder

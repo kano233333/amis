@@ -8,9 +8,9 @@ import React from 'react';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {Icon} from './icons';
-import PopOver from './PopOver';
+import {PopOver} from 'amis-core';
 import PopUp from './PopUp';
-import Overlay from './Overlay';
+import {Overlay} from 'amis-core';
 import {ClassNamesFn, themeable, ThemeProps} from 'amis-core';
 import Calendar from './calendar/Calendar';
 import {localeable, LocaleProps, TranslateFn} from 'amis-core';
@@ -276,7 +276,7 @@ export interface DateProps extends LocaleProps, ThemeProps {
     };
   };
   popOverContainer?: any;
-
+  label?: string | false;
   borderMode?: 'full' | 'half' | 'none';
   // 是否为内嵌模式，如果开启就不是 picker 了，直接页面点选。
   embed?: boolean;
@@ -288,6 +288,7 @@ export interface DateProps extends LocaleProps, ThemeProps {
   }>;
   scheduleClassNames?: Array<string>;
   largeMode?: boolean;
+  todayActiveStyle?: React.CSSProperties;
   onScheduleClick?: (scheduleData: any) => void;
   useMobileUI?: boolean;
   // 在移动端日期展示有多种形式，一种是picker 滑动选择，一种是日历展开选择，mobileCalendarMode为calendar表示日历展开选择
@@ -356,11 +357,14 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
     this.handlePopOverClick = this.handlePopOverClick.bind(this);
     this.renderShortCuts = this.renderShortCuts.bind(this);
     this.inputChange = this.inputChange.bind(this);
+    this.onInputBlur = this.onInputBlur.bind(this);
   }
 
   dom: HTMLDivElement;
 
   inputRef: React.RefObject<HTMLInputElement>;
+  // 缓存上一次的input值
+  inputValueCache: string;
 
   componentDidMount() {
     this.props?.onRef?.(this);
@@ -378,7 +382,7 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
 
       newState.inputValue =
         newState.value?.format(this.props.inputFormat) || '';
-
+      this.inputValueCache = newState.inputValue;
       this.setState(newState);
     }
   }
@@ -533,6 +537,12 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
     }
   }
 
+  onInputBlur() {
+    this.setState({
+      inputValue: this.inputValueCache
+    });
+  }
+
   selectRannge(item: any) {
     const {closeOnSelect} = this.props;
     const now = moment();
@@ -656,8 +666,10 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
       schedules,
       largeMode,
       scheduleClassNames,
+      todayActiveStyle,
       onScheduleClick,
-      mobileCalendarMode
+      mobileCalendarMode,
+      label
     } = this.props;
 
     const __ = this.props.translate;
@@ -687,7 +699,7 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
     );
     const CalendarMobileTitle = (
       <div className={`${ns}CalendarMobile-title`}>
-        {__('Calendar.datepicker')}
+        {label && typeof label === 'string' ? label : __('Calendar.datepicker')}
       </div>
     );
     const useCalendarMobile =
@@ -744,6 +756,7 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
             // utc={utc}
             schedules={schedulesData}
             largeMode={largeMode}
+            todayActiveStyle={todayActiveStyle}
             onScheduleClick={onScheduleClick}
             embed={embed}
             useMobileUI={useMobileUI}
@@ -774,10 +787,11 @@ export class DatePicker extends React.Component<DateProps, DatePickerState> {
         <Input
           className={cx('DatePicker-input')}
           onChange={this.inputChange}
+          onBlur={this.onInputBlur}
           ref={this.inputRef}
           placeholder={__(placeholder)}
           autoComplete="off"
-          value={this.state.inputValue}
+          value={this.state.inputValue || ''}
           disabled={disabled}
         />
 

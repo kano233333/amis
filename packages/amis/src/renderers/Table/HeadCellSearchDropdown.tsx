@@ -2,9 +2,9 @@ import React from 'react';
 import {RendererProps} from 'amis-core';
 import {ActionObject} from 'amis-core';
 import {Icon} from 'amis-ui';
-import {Overlay} from 'amis-ui';
+import {Overlay} from 'amis-core';
 import {findDOMNode} from 'react-dom';
-import {PopOver} from 'amis-ui';
+import {PopOver} from 'amis-core';
 import {ITableStore} from 'amis-core';
 import {setVariable, createObject} from 'amis-core';
 
@@ -243,7 +243,11 @@ export class HeadCellSearchDropDown extends React.Component<
 
     return (
       <span
-        className={cx(`${ns}TableCell-searchBtn`, isActive ? 'is-active' : '')}
+        className={cx(
+          `${ns}TableCell-searchBtn`,
+          isActive ? 'is-active' : '',
+          this.state.isOpened ? 'is-opened' : ''
+        )}
       >
         <span onClick={this.open}>
           <Icon icon="search" className="icon" />

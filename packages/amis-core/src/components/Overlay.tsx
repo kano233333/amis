@@ -8,10 +8,17 @@ import Portal from 'react-overlays/Portal';
 import classNames from 'classnames';
 import ReactDOM, {findDOMNode} from 'react-dom';
 import React, {cloneElement} from 'react';
-import {calculatePosition, getContainer, ownerDocument} from 'amis-core';
-import {autobind, getScrollParent, noop} from 'amis-core';
-import {resizeSensor, getComputedStyle} from 'amis-core';
-import {RootClose} from 'amis-core';
+import {
+  autobind,
+  calculatePosition,
+  getComputedStyle,
+  getContainer,
+  getScrollParent,
+  noop,
+  ownerDocument,
+  resizeSensor,
+  RootClose
+} from '../utils';
 
 function onScroll(elem: HTMLElement, callback: () => void) {
   const handler = () => {
@@ -149,6 +156,8 @@ class Position extends React.Component<any, any> {
     return cloneElement(child, {
       ...props,
       ...arrowPosition,
+      // 防止 child offset 被 Overlay offset 覆盖
+      ...(child.props.offset ? {offset: child.props.offset} : {}),
       // FIXME: Don't forward `positionLeft` and `positionTop` via both props
       // and `props.style`.
       positionLeft,
@@ -172,6 +181,7 @@ interface OverlayProps {
   rootClose?: boolean;
   onHide?(props: any, ...args: any[]): any;
   container?: React.ReactNode | Function;
+  containerSelector?: string;
   target?: React.ReactNode | Function;
   watchTargetSizeChange?: boolean;
   offset?: [number, number];
@@ -228,9 +238,20 @@ export default class Overlay extends React.Component<
     }
   }
 
+  @autobind
+  getContainerSelector() {
+    const containerSelector = this.props.containerSelector;
+    let container = null;
+
+    if (typeof containerSelector === 'string') {
+      container = document.querySelector(containerSelector);
+    }
+
+    return container;
+  }
+
   render() {
     const {
-      container,
       containerPadding,
       target,
       placement,
@@ -242,7 +263,9 @@ export default class Overlay extends React.Component<
       offset,
       ...props
     } = this.props;
-
+    const container = this.getContainerSelector()
+      ? this.getContainerSelector
+      : this.props.container;
     const mountOverlay = props.show || (Transition && !this.state.exited);
     if (!mountOverlay) {
       // Don't bother showing anything if we don't have to.
@@ -299,7 +322,7 @@ export default class Overlay extends React.Component<
           <RootClose onRootClose={props.onHide}>
             {(ref: any) => {
               if (React.isValidElement(child)) {
-                return React.cloneElement(child, {
+                return React.cloneElement(child as React.ReactElement, {
                   ref: ref
                 });
               }

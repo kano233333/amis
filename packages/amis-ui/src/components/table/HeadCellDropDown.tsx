@@ -6,9 +6,15 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 
-import {themeable, ThemeProps, LocaleProps, localeable} from 'amis-core';
-import Overlay from '../Overlay';
-import PopOver from '../PopOver';
+import {
+  themeable,
+  ThemeProps,
+  LocaleProps,
+  localeable,
+  ClassNamesFn,
+  Overlay,
+  PopOver
+} from 'amis-core';
 
 export interface FilterPayload {
   closeDropdown?: boolean;
@@ -30,6 +36,8 @@ export interface Props extends ThemeProps, LocaleProps {
   filterDropdown: (payload: FilterDropdownProps) => JSX.Element | null; // 菜单内容
   selectedKeys?: Array<string | number> | string;
   setSelectedKeys?: (keys: Array<string | number> | string) => void;
+  classnames: ClassNamesFn;
+  classPrefix: string;
 }
 
 export interface State {

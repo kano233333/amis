@@ -12,7 +12,7 @@ import {str2rules, validate as doValidate} from '../utils/validations';
 import {Api, Payload, fetchOptions} from '../types';
 import {ComboStore, IComboStore, IUniqueGroup} from './combo';
 import {evalExpression} from '../utils/tpl';
-import {isEffectiveApi} from '../utils/api';
+import {buildApi, isEffectiveApi} from '../utils/api';
 import findIndex from 'lodash/findIndex';
 import {
   isArrayChildrenModified,
@@ -31,6 +31,7 @@ import {StoreNode} from './node';
 import {getStoreById} from './manager';
 import {normalizeOptions} from '../utils/normalizeOptions';
 import {optionValueCompare} from '../utils/optionValueCompare';
+import {dataMapping} from '../utils/dataMapping';
 
 interface IOption {
   value?: string | number | null;
@@ -286,7 +287,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
 
       rules = {
         ...rules,
-        isRequired: self.required
+        isRequired: self.required || rules?.isRequired
       };
 
       // todo 这个弄个配置由渲染器自己来决定
@@ -384,6 +385,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
             item =>
               item !== self &&
               self.tmpValue !== undefined &&
+              self.tmpValue !== '' &&
               item.value === self.tmpValue
           )
         ) {
@@ -448,7 +450,10 @@ export const FormItemStore = StoreNode.named('FormItemStore')
           if (childFirst !== undefined) {
             return childFirst;
           }
-        } else if (option[self.valueField || 'value'] && !option.disabled) {
+        } else if (
+          option[self.valueField || 'value'] != null &&
+          !option.disabled
+        ) {
           return option;
         }
       }
@@ -531,6 +536,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
         let result: any = null;
 
         if (!json.ok) {
+          const apiObject = buildApi(api, data);
           setErrorFlag !== false &&
             setError(
               self.__('Form.loadOptionsFailed', {
@@ -539,7 +545,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
             );
           getEnv(self).notify(
             'error',
-            self.errors.join('') || `${api}：${json.msg}`,
+            self.errors.join('') || `${apiObject.url}：${json.msg}`,
             json.msgTimeout !== undefined
               ? {
                   closeButton: true,
@@ -668,7 +674,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       }
 
       !silent &&
-        getEnv(self).notify('info', self.__('FormItem.autoUpdateloadFaild'));
+        getEnv(self).notify('info', self.__('FormItem.autoFillLoadFailed'));
 
       return;
     });
@@ -1169,13 +1175,19 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       !keepErrors && clearError();
     }
 
-    function openDialog(
-      schema: any,
-      data: any,
-      callback?: (ret?: any) => void
-    ) {
+    function resetValidationStatus(tag?: string) {
+      self.validated = false;
+      clearError();
+    }
+
+    function openDialog(schema: any, ctx: any, callback?: (ret?: any) => void) {
+      if (schema.data) {
+        self.dialogData = dataMapping(schema.data, ctx);
+      } else {
+        self.dialogData = ctx;
+      }
+
       self.dialogSchema = schema;
-      self.dialogData = data;
       self.dialogOpen = true;
       callback && dialogCallbacks.set(self.dialogData, callback);
     }
@@ -1227,6 +1239,7 @@ export const FormItemStore = StoreNode.named('FormItemStore')
       setSubStore,
       getSubStore,
       reset,
+      resetValidationStatus,
       openDialog,
       closeDialog,
       changeTmpValue,

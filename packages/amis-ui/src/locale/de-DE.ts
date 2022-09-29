@@ -19,6 +19,7 @@ register('de-DE', {
   'Time': 'Zeit',
   'Content': 'Inhalt',
   'cancel': 'Abbrechen',
+  'more': 'mehr',
   'Card.dragTip': 'Obere Schaltfläche zum Sortieren ziehen',
   'Card.toggleDrag': 'Zum Sortieren umschalten',
   'City.street': 'Straße eingeben',
@@ -129,19 +130,21 @@ register('de-DE', {
   'File.failed': 'Fehlerhafte Dateien',
   'File.invalidType': '{{files}} entspricht nicht Typ `{{accept}}`',
   'File.maxSize':
-    '{{filename}} überschreitet die maximale Größe von {{maxsize}} (in Byte)',
+    '{{filename}} überschreitet die maximale Größe von {{maxSize}}',
   'File.pause': 'Hochladen anhalten',
   'File.repick': 'Erneut suswählen',
   'File.result':
     'Erfolgreich hochgeladene Dateien: {{uploaded}}, nicht hochgeladene Dateien: {{failed}}',
   'File.retry': 'Wiederholen',
+  'File.sizeLimit': 'Die maximale Dateigröße ist {{maxSize}}',
   'File.start': 'Hochladen beginnen',
   'File.upload': 'Hochladen',
   'Image.upload': 'Hochladen',
   'File.uploadFailed': 'Zurückgegebene Daten der Upload-API sind leer',
   'File.uploading': 'Wird hochgeladen...',
-  'FormItem.autoUpdateloadFaild':
+  'FormItem.autoFillLoadFailed':
     'Die Schnittstelle hat einen Fehler zurückgegeben, bitte sorgfältig prüfen',
+  'FormItem.autoFillSuggest': 'Referenzdateneingabe',
   'Form.loadOptionsFailed':
     'Optionen wurden auf folgendem Grund nicht geladen: {{reason}}',
   'Form.submit': 'Absenden',
@@ -149,6 +152,9 @@ register('de-DE', {
   'Form.unique': 'Aktueller Wert ist nicht eindeutig',
   'Form.validateFailed': 'Fehler bei der Überprüfung der Formulareingabe',
   'Form.nestedError': 'Form kann nicht als Nachkomme von Form erscheinen',
+  'Iframe.invalid': 'Ungültige Iframe-URL',
+  'Iframe.invalidProtocol':
+    'HTTP-URL-Iframe kann nicht in https verwendet werden',
   'Image.configError':
     'Es können nur eine Beschneidung oder mehrere festgelegt werden',
   'Image.crop': 'Bild beschneiden',
@@ -169,8 +175,8 @@ register('de-DE', {
   'Log.mustHaveSource': 'Quelle muss in der Konfiguration vorhanden sein',
   'Log.showLineNumber': 'Zeilennummer anzeigen',
   'Log.notShowLineNumber': 'Zeilennummer ausblenden',
-  'Log.expand': 'Erweitern',
-  'Log.collapse': 'Zusammenbruch',
+  'Log.expand': 'Entfalten',
+  'Log.collapse': 'Falten',
   'link': 'Link',
   'loading': 'Wird geladen...',
   'LocationPicker.placeholder': 'Wählen Sie einen Ort',
@@ -193,9 +199,11 @@ register('de-DE', {
   'Quarter.placeholder': 'Quartal auswählen',
   'Repeat.pre': 'Pro',
   'reset': 'Zurücksetzen',
+  'save': 'Konservierung',
   'saveFailed': 'Fehler beim Speichern',
   'saveSuccess': 'Erfolgreich gespeichert',
   'search': 'Suchen',
+  'searchHistory': 'Suchverlauf',
   'searchResult': 'Suchergebnis',
   'Checkboxes.selectAll': 'Alle auswählen/abwählen',
   'Select.checkAll': 'Alle markieren',
@@ -278,6 +286,30 @@ register('de-DE', {
   'validate.minimum': 'Der Eingabewert ist kleiner als der Mindestwert von $1.',
   'validate.minLength': 'Geben Sie weitere Zeichen ein, mindestens $1.',
   'validate.notEmptyString': 'Geben Sie nicht nur Leerzeichen ein.',
+  'validate.isDateTimeSame':
+    'Der aktuelle Datumswert ist ungültig, bitte geben Sie denselben Datumswert wie $1 ein',
+  'validate.isDateTimeBefore':
+    'Der aktuelle Datumswert ist ungültig, bitte geben Sie einen Datumswert vor $1 ein',
+  'validate.isDateTimeAfter':
+    'Der aktuelle Datumswert ist ungültig, bitte geben Sie nach $1 einen Datumswert ein',
+  'validate.isDateTimeSameOrBefore':
+    'Der aktuelle Datumswert ist ungültig. Bitte geben Sie einen Datumswert ein, der gleich oder älter als $1 ist',
+  'validate.isDateTimeSameOrAfter':
+    'Der aktuelle Datumswert ist ungültig. Bitte geben Sie einen Datumswert ein, der gleich oder nach $1 ist',
+  'validate.isDateTimeBetween':
+    'Der aktuelle Datumswert ist ungültig, bitte geben Sie einen Datumswert zwischen $1 und $2 ein',
+  'validate.isTimeSame':
+    'Der aktuelle Zeitwert ist ungültig, bitte geben Sie denselben Zeitwert wie 1 $ ein',
+  'validate.isTimeBefore':
+    'Der aktuelle Zeitwert ist ungültig, bitte geben Sie einen Zeitwert vor $1 ein',
+  'validate.isTimeAfter':
+    'Der aktuelle Zeitwert ist ungültig, bitte geben Sie nach $1 einen Zeitwert ein',
+  'validate.isTimeSameOrBefore':
+    'Der aktuelle Zeitwert ist ungültig. Bitte geben Sie einen Zeitwert ein, der gleich oder älter als $1 ist',
+  'validate.isTimeSameOrAfter':
+    'Der aktuelle Zeitwert ist ungültig. Bitte geben Sie einen Zeitwert ein, der gleich oder nach $1 ist',
+  'validate.isTimeBetween':
+    'Der aktuelle Zeitwert ist ungültig, bitte geben Sie einen Zeitwert zwischen $1 und $2 ein',
   'validateFailed': 'Fehler bei der Überprüfung',
   'Wizard.configError': 'Konfigurationsfehler',
   'Wizard.finish': 'Ende',
@@ -288,6 +320,11 @@ register('de-DE', {
   'Year.placeholder': 'Wählen Sie ein Jahr',
   'reload': 'Neu laden',
   'rotate': 'Drehen',
+  'rotate.left': 'Nach links drehen',
+  'rotate.right': 'Drehe nach rechts',
+  'zoomIn': 'Vergrößern',
+  'zoomOut': 'Verkleinern',
+  'scale.origin': 'Originalmaße',
   'Editor.fullscreen': 'Schirmfüllend Modus',
   'Editor.exitFullscreen': 'Zurücktreten Schirmfüllend Modus',
   'Condition.not': 'nicht',
@@ -322,8 +359,10 @@ register('de-DE', {
   'Condition.formula_placeholder': 'Bitte geben Sie eine Formel ein',
   'Condition.fun_error': 'Funktion ist undefiniert',
   'InputTable.uniqueError': 'Column `{{label}}` unique validate failed',
-  'Timeline.collapseText': 'Entfalten',
-  'Timeline.expandText': 'Falten',
+  'Timeline.collapseText': 'Falten',
+  'Timeline.expandText': 'Entfalten',
+  'collapse': 'Falten',
+  'expand': 'Entfalten',
   'FormulaEditor.btnLabel': 'Formel Bearbeiten',
   'FormulaEditor.title': 'Formel Editor',
   'FormulaEditor.variable': 'Variable',
@@ -340,6 +379,7 @@ register('de-DE', {
   'UserSelect.resultSort': 'Ergebnissortierung auswählen',
   'UserSelect.selected': 'Ausgewählt',
   'UserSelect.clear': 'leer',
+  'UserSelect.sure': 'Submit',
   'SchemaType.string': 'String',
   'SchemaType.number': 'Number',
   'SchemaType.integer': 'integer',

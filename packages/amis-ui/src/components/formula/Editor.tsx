@@ -138,6 +138,24 @@ export class FormulaEditor extends React.Component<
     evalMode: true
   };
 
+  static replaceStrByIndex(
+    str: string,
+    idx: number,
+    key: string,
+    replaceKey: string
+  ) {
+    const from = str.slice(0, idx);
+    const left = str.slice(idx);
+    return from + left.replace(key, replaceKey);
+  }
+
+  static getRegExpByMode(evalMode: boolean, key: string) {
+    const reg = evalMode
+      ? `\\b${key}\\b`
+      : `\\$\\{[^\\{\\}]*\\b${key}\\b[^\\{\\}]*\\}`;
+    return new RegExp(reg);
+  }
+
   static highlightValue(
     value: string,
     variables: Array<VariableItem>,
@@ -169,15 +187,29 @@ export class FormulaEditor extends React.Component<
       return _?.replace(func, `<span class="c-func">${func}</span>`);
     });
 
+    const REPLACE_KEY = 'AMIS_FORMULA_REPLACE_KEY';
     vars.forEach(v => {
       let from = 0;
       let idx = -1;
       while (~(idx = content.indexOf(v, from))) {
-        const curNameEg = new RegExp(`\\b${v}\\b`, 'g'); // 避免变量识别冲突，比如：name、me 被识别成 na「me」
-        html = html.replace(
-          curNameEg,
-          `<span class="c-field">${varMap[v]}</span>`
+        const encodeHtml = FormulaEditor.replaceStrByIndex(
+          html,
+          idx,
+          v,
+          REPLACE_KEY
         );
+        const reg = FormulaEditor.getRegExpByMode(evalMode, REPLACE_KEY);
+
+        // 如果匹配到则高亮，没有匹配到替换成原值
+        if (reg.test(encodeHtml)) {
+          html = encodeHtml.replace(
+            REPLACE_KEY,
+            `<span class="c-field">${varMap[v]}</span>`
+          );
+        } else {
+          html = encodeHtml.replace(REPLACE_KEY, v);
+        }
+
         from = idx + v.length;
       }
     });
@@ -239,7 +271,12 @@ export class FormulaEditor extends React.Component<
   handleVariableSelect(item: VariableItem) {
     const {evalMode, selfVariableName} = this.props;
 
-    if (item && item.value && (selfVariableName && selfVariableName === item.value)) {
+    if (
+      item &&
+      item.value &&
+      selfVariableName &&
+      selfVariableName === item.value
+    ) {
       toast.warning('不能使用当前变量[self]，避免循环引用。');
       return;
     }

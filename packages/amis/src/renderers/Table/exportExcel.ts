@@ -47,11 +47,25 @@ export async function exportExcel(
       env.notify('warning', __('placeholder.noData'));
       return;
     }
+    /**
+     * 优先找items和rows，找不到就拿第一个值为数组的字段
+     * 和CRUD中的处理逻辑保持一致，避免能渲染和导出的不一致
+     */
     if (Array.isArray(res.data)) {
       rows = res.data;
+    } else if (Array.isArray(res.data?.rows)) {
+      rows = res.data.rows;
+    } else if (Array.isArray(res.data?.items)) {
+      rows = res.data.items;
     } else {
-      rows = res.data.rows || res.data.items;
+      for (const key of Object.keys(res.data)) {
+        if (res.data.hasOwnProperty(key) && Array.isArray(res.data[key])) {
+          rows = res.data[key];
+          break;
+        }
+      }
     }
+
     // 因为很多方法是 store 里的，所以需要构建 store 来处理
     tmpStore = TableStore.create(getSnapshot(store));
     tmpStore.initRows(rows);
@@ -152,7 +166,7 @@ export async function exportExcel(
 
       const type = (column as BaseSchema).type || 'plain';
       // TODO: 这里很多组件都是拷贝对应渲染的逻辑实现的，导致
-      if (type === 'image' && value) {
+      if ((type === 'image' || (type as any) === 'static-image') && value) {
         try {
           const imageData = await toDataURL(value);
           const imageDimensions = await getImageDimensions(imageData);
@@ -200,7 +214,7 @@ export async function exportExcel(
         } catch (e) {
           console.warn(e.stack);
         }
-      } else if (type == 'link') {
+      } else if (type == 'link' || (type as any) === 'static-link') {
         const href = column.pristine.href;
         const linkURL =
           (typeof href === 'string' && href
@@ -218,7 +232,7 @@ export async function exportExcel(
           text: text || absoluteURL,
           hyperlink: absoluteURL
         };
-      } else if (type === 'mapping') {
+      } else if (type === 'mapping' || (type as any) === 'static-mapping') {
         // 拷贝自 Mapping.tsx
         let map = column.pristine.map;
         const source = column.pristine.source;
@@ -256,7 +270,7 @@ export async function exportExcel(
         } else {
           sheetRow.getCell(columIndex).value = removeHTMLTag(value);
         }
-      } else if (type === 'date') {
+      } else if (type === 'date' || (type as any) === 'static-date') {
         let viewValue;
         const {
           fromNow,

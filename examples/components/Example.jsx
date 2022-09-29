@@ -30,6 +30,8 @@ import CustomFormSchema from './Form/Custom';
 import FormLayoutTestSchema from './Form/layoutTest';
 import Definitions from './Form/Definitions';
 import AnchorNav from './Form/AnchorNav';
+import InputKVSSchema from './Form/InputKVS';
+import Tree from './Form/Tree';
 
 import TableCrudSchema from './CRUD/Table';
 import TableAutoFillSchema from './CRUD/TableAutoFill';
@@ -116,6 +118,7 @@ import DynamicTabSchema from './Tabs/Dynamic';
 import Tab1Schema from './Tabs/Tab1';
 import Tab2Schema from './Tabs/Tab2';
 import Tab3Schema from './Tabs/Tab3';
+import Loading from './Loading';
 
 import {Switch} from 'react-router-dom';
 import {navigations2route} from './App';
@@ -294,6 +297,18 @@ export const examples = [
             label: '锚点导航',
             path: '/examples/form/anchor-nav',
             component: makeSchemaRenderer(AnchorNav)
+          },
+
+          {
+            label: '复杂嵌套数据',
+            path: '/examples/form/input-kvs',
+            component: makeSchemaRenderer(InputKVSSchema)
+          },
+
+          {
+            label: '树形结构',
+            path: '/examples/form/tree',
+            component: makeSchemaRenderer(Tree)
           }
 
           // {
@@ -806,6 +821,13 @@ export const examples = [
         icon: 'fa fa-rocket',
         path: '/examples/sdk',
         component: SdkTest
+      },
+
+      {
+        label: '多 loading',
+        icon: 'fa fa-spinner',
+        path: '/examples/loading',
+        component: makeSchemaRenderer(Loading)
       },
 
       {

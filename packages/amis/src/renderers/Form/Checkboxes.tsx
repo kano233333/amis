@@ -1,15 +1,15 @@
 import React from 'react';
+import inRange from 'lodash/inRange';
 import {
   OptionsControl,
-  OptionsControlProps,
-  Option,
-  FormOptionsControl
+  createObject,
+  autobind,
+  hasAbility,
+  columnsSplit,
+  flattenTreeWithLeafNodes
 } from 'amis-core';
-import {Checkbox} from 'amis-ui';
-import {Icon} from 'amis-ui';
-import {ActionObject, Api} from 'amis-core';
-import {autobind, hasAbility} from 'amis-core';
-import {columnsSplit} from 'amis-core';
+import type {ActionObject, Api, OptionsControlProps, Option} from 'amis-core';
+import {Checkbox, Icon} from 'amis-ui';
 import {FormOptionsSchema} from '../../Schema';
 
 /**
@@ -33,6 +33,11 @@ export interface CheckboxesControlSchema extends FormOptionsSchema {
    * 每行显示多少个
    */
   columnsCount?: number | number[];
+
+  /**
+   * 自定义选项展示
+   */
+  menuTpl?: string;
 }
 
 export interface CheckboxesProps
@@ -56,6 +61,7 @@ export interface CheckboxesProps
   editable?: boolean;
   removable?: boolean;
   optionType?: 'default' | 'button';
+  menuTpl?: string;
 }
 
 export default class CheckboxesControl extends React.Component<
@@ -115,7 +121,7 @@ export default class CheckboxesControl extends React.Component<
     window.addEventListener('resize', this.updateBorderStyle);
   }
 
-  componentWillMount() {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.updateBorderStyle);
   }
 
@@ -206,9 +212,15 @@ export default class CheckboxesControl extends React.Component<
       return null;
     }
 
+    const children = option.children.map((option, index) =>
+      this.renderItem(option, index)
+    );
+
+    const body = this.columnsSplit(children);
+
     return (
       <div
-        key={index}
+        key={'group-' + index}
         className={cx('CheckboxesControl-group', option.className)}
       >
         <label
@@ -217,7 +229,7 @@ export default class CheckboxesControl extends React.Component<
           {option[labelField || 'label']}
         </label>
 
-        {option.children.map((option, index) => this.renderItem(option, index))}
+        {body}
       </div>
     );
   }
@@ -228,6 +240,7 @@ export default class CheckboxesControl extends React.Component<
     }
 
     const {
+      render,
       itemClassName,
       onToggle,
       selectedOptions,
@@ -238,8 +251,12 @@ export default class CheckboxesControl extends React.Component<
       removable,
       editable,
       translate: __,
-      optionType
+      optionType,
+      menuTpl,
+      data
     } = this.props;
+    const labelText = String(option[labelField || 'label']);
+    const optionLabelClassName = option['labelClassName'];
 
     return (
       <Checkbox
@@ -249,11 +266,15 @@ export default class CheckboxesControl extends React.Component<
         checked={!!~selectedOptions.indexOf(option)}
         disabled={disabled || option.disabled}
         inline={inline}
-        labelClassName={labelClassName}
+        labelClassName={optionLabelClassName || labelClassName}
         description={option.description}
         optionType={optionType}
       >
-        {String(option[labelField || 'label'])}
+        {menuTpl
+          ? render(`checkboxes/${index}`, menuTpl, {
+              data: createObject(data, option)
+            })
+          : labelText}
         {removable && hasAbility(option, 'removable') ? (
           <a data-tooltip={__('Select.clear')} data-position="left">
             <Icon
@@ -274,6 +295,31 @@ export default class CheckboxesControl extends React.Component<
         ) : null}
       </Checkbox>
     );
+  }
+
+  columnsSplit(body: React.ReactNode[]) {
+    const {columnsCount, classnames: cx} = this.props;
+
+    const result: Array<any> = [];
+    let tmp: Array<React.ReactPortal> = [];
+    body.forEach((node: React.ReactPortal) => {
+      // 如果有分组，组内单独分列
+      if (node && node.key && String(node.key).startsWith('group')) {
+        // 夹杂在分组间的无分组选项，分别成块
+        if (tmp.length) {
+          result.push(columnsSplit(tmp, cx, columnsCount));
+          tmp = [];
+        }
+
+        result.push(node);
+      } else {
+        tmp.push(node);
+      }
+    });
+    // 收尾
+    tmp.length && result.push(columnsSplit(tmp, cx, columnsCount));
+
+    return result;
   }
 
   render() {
@@ -311,12 +357,11 @@ export default class CheckboxesControl extends React.Component<
           className={itemClassName}
           onChange={onToggleAll}
           checked={!!selectedOptions.length}
-          partial={
-            !!(
-              selectedOptions.length &&
-              selectedOptions.length !== options.length
-            )
-          }
+          partial={inRange(
+            selectedOptions.length,
+            0,
+            flattenTreeWithLeafNodes(options).length
+          )}
           disabled={disabled}
           inline={inline}
           labelClassName={labelClassName}
@@ -326,7 +371,7 @@ export default class CheckboxesControl extends React.Component<
       );
     }
 
-    body = columnsSplit(body, cx, columnsCount);
+    body = this.columnsSplit(body);
 
     return (
       <div className={cx(`CheckboxesControl`, className)} ref="checkboxRef">

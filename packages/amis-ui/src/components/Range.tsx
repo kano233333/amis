@@ -11,7 +11,7 @@ import difference from 'lodash/difference';
 import React from 'react';
 import {uncontrollable} from 'amis-core';
 
-import Overlay from './Overlay';
+import {Overlay} from 'amis-core';
 import type {ThemeProps} from 'amis-core';
 import {themeable} from 'amis-core';
 import {autobind, camel} from 'amis-core';
@@ -78,7 +78,8 @@ const MARKS_REG = /^[0-9]+(\.?[0-9]+)?%$/;
  * @returns position.left
  */
 const valueToOffsetLeft = (value: any, min: number, max: number) =>
-  ((value - min) * 100) / (max - min) + '%';
+  // 最多保留两位小数，且尽量取整
+  Math.floor(((value - min) * 10000) / (max - min)) / 100 + '%';
 
 /**
  * 滑块handle

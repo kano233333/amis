@@ -277,6 +277,63 @@ order: 24
   }
 ```
 
+### 自定义 label 宽度
+
+水平模式下 `labelWidth` 可以设置标签文本的自定义宽度，默认单位为`px`。该属性的优先级：表单项 > 表单。
+
+```schema: scope="body"
+{
+  "type": "form",
+  "title": "label对齐模式",
+  "mode": "horizontal",
+  "labelWidth": 120,
+  "body": [
+    {
+      "type": "input-email",
+      "name": "email",
+      "label": "邮箱",
+      "labelWidth": 200,
+      "required": true
+    },
+    {
+      "type": "input-password",
+      "name": "password",
+      "label": "密码",
+      "required": true
+    },
+    {
+      "type": "input-text",
+      "name": "address",
+      "label": "地址",
+      "mode": "inline"
+    },
+    {
+      "type": "input-text",
+      "name": "mailCode",
+      "label": "邮编",
+      "mode": "inline",
+      "labelWidth": 80
+    },
+    {
+      "type": "radios",
+      "name": "mailCode",
+      "label": "性别",
+      "mode": "row",
+      "options": [
+        {
+          "label": "Male",
+          "value": "male"
+        },
+        {
+          "label": "Female",
+          "value": "female"
+        }
+      ]
+    }
+  ]
+}
+```
+
 ### 实现一行展示多个表单项
 
 有两种方法，一个是通过 `columnCount` 来控制表单显示几列
@@ -1158,6 +1215,12 @@ Form 支持轮询初始化接口，步骤如下：
 
 如果想提交成功后，清空该缓存，则配置`"clearPersistDataAfterSubmit": true`
 
+### 限制只存储某些 key
+
+> 2.3.0 及以上版本
+
+如果只想存储部分 key，可以配置 `"persistDataKeys": ["key1", "key2"]`，这样就只有 name 为 key1 和 key2 的表单项数据会持久化
+
 ## 禁用回车提交
 
 表单默认情况下回车就会提交，如果想阻止这个行为，可以加上 `preventEnterSubmit` 配置项。
@@ -1191,6 +1254,7 @@ Form 支持轮询初始化接口，步骤如下：
 | mode                        | `string`                                                                  | `normal`                                                               | 表单展示方式，可以是：`normal`、`horizontal` 或者 `inline`                                                                                                                                                                                                                                                                                                   |
 | horizontal                  | `Object`                                                                  | `{"left":"col-sm-2", "right":"col-sm-10", "offset":"col-sm-offset-2"}` | 当 mode 为 `horizontal` 时有用，用来控制 label                                                                                                                                                                                                                                                                                                               |
 | labelAlign                  | `"right" \| "left"`                                                       | `"right"`                                                              | 表单项标签对齐方式，默认右对齐，仅在 `mode`为`horizontal` 时生效                                                                                                                                                                                                                                                                                             |
+| labelWidth                  | `number \| string`                                                        |                                                                        | 表单项标签自定义宽度                                                                                                                                                                                                                                                                                                                                         |
 | title                       | `string`                                                                  | `"表单"`                                                               | Form 的标题                                                                                                                                                                                                                                                                                                                                                  |
 | submitText                  | `String`                                                                  | `"提交"`                                                               | 默认的提交按钮名称，如果设置成空，则可以把默认按钮去掉。                                                                                                                                                                                                                                                                                                     |
 | className                   | `string`                                                                  |                                                                        | 外层 Dom 的类名                                                                                                                                                                                                                                                                                                                                              |
@@ -1227,6 +1291,7 @@ Form 支持轮询初始化接口，步骤如下：
 | autoFocus                   | `boolean`                                                                 | `false`                                                                | 是否自动聚焦。                                                                                                                                                                                                                                                                                                                                               |
 | canAccessSuperData          | `boolean`                                                                 | `true`                                                                 | 指定是否可以自动获取上层的数据并映射到表单项上                                                                                                                                                                                                                                                                                                               |
 | persistData                 | `string`                                                                  | `""`                                                                   | 指定一个唯一的 key，来配置当前表单是否开启本地缓存                                                                                                                                                                                                                                                                                                           |
+| persistDataKeys             | `string[]`                                                                | `""`                                                                   | 指指定只有哪些 key 缓存                                                                                                                                                                                                                                                                                                                                      |
 | clearPersistDataAfterSubmit | `boolean`                                                                 | `true`                                                                 | 指定表单提交成功后是否清除本地缓存                                                                                                                                                                                                                                                                                                                           |
 | preventEnterSubmit          | `boolean`                                                                 | `false`                                                                | 禁用回车提交表单                                                                                                                                                                                                                                                                                                                                             |
 | trimValues                  | `boolean`                                                                 | `false`                                                                | trim 当前表单项的每一个值                                                                                                                                                                                                                                                                                                                                    |
@@ -1245,7 +1310,7 @@ Form 支持轮询初始化接口，步骤如下：
 | formItemValidateSucc  | `event.data: object` 当前表单数据                            | 表单项校验成功时触发         |
 | formItemValidateError | `event.data: object` 当前表单数据                            | 表单项校验失败时触发         |
 | validateSucc          | `event.data: object` 当前表单数据                            | 表单校验成功时触发           |
-| validateError         | `event.data: object` 当前表单数据                            | 表单校验成功时触发           |
+| validateError         | `event.data: object` 当前表单数据                            | 表单校验失败时触发           |
 | submitSucc            | `event.data.result: object` api 远程请求成功后返回的结果数据 | 提交成功时触发               |
 | submitFail            | `event.data.error: object` api 远程请求失败后返回的错误信息  | 提交失败时触发               |
 

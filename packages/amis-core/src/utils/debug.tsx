@@ -53,6 +53,11 @@ class AMISDebugStore {
    * 当前选中的组件节点 id
    */
   @observable activeId: string;
+
+  /**
+   * 字段值文本最大展示长度
+   */
+  @observable ellipsisThreshold: number;
 }
 
 const store = new AMISDebugStore();
@@ -67,6 +72,8 @@ const ComponentInfo = {} as {[propName: string]: ComponentInspect};
 
 const LogView = observer(({store}: {store: AMISDebugStore}) => {
   const logs = store.logs;
+  const ellipsisThreshold = store.ellipsisThreshold ?? 50;
+
   return (
     <>
       {logs.map((log, index) => {
@@ -83,6 +90,7 @@ const LogView = observer(({store}: {store: AMISDebugStore}) => {
                 collapsed={true}
                 enableClipboard={false}
                 displayDataTypes={false}
+                collapseStringsAfterLength={ellipsisThreshold}
                 iconStyle="square"
               />
             ) : null}
@@ -199,6 +207,8 @@ const AMISDebug = observer(({store}: {store: AMISDebugStore}) => {
           title="Close"
           onClick={() => {
             store.isExpanded = false;
+            store.activeId = '';
+            store.hoverId = '';
           }}
         >
           <i className="fas fa-times" />
@@ -331,6 +341,8 @@ autorun(() => {
     amisHoverBox.style.left = `${offset.left}px`;
     amisHoverBox.style.width = `${offset.width}px`;
     amisHoverBox.style.height = `${offset.height}px`;
+  } else {
+    amisHoverBox.style.top = '-999999px';
   }
 });
 
@@ -339,12 +351,15 @@ autorun(() => {
   const activeElement = document.querySelector(
     `[data-debug-id="${activeId}"]`
   ) as HTMLElement;
+
   if (activeElement) {
     const offset = position(activeElement, document.body);
     amisActiveBox.style.top = `${offset.top}px`;
     amisActiveBox.style.left = `${offset.left}px`;
     amisActiveBox.style.width = `${offset.width}px`;
     amisActiveBox.style.height = `${offset.height}px`;
+  } else {
+    amisActiveBox.style.top = '-999999px';
   }
 });
 
@@ -373,18 +388,33 @@ interface DebugWrapperProps {
 }
 
 export class DebugWrapper extends Component<DebugWrapperProps> {
+  debugId: string = uuidv4();
   componentDidMount() {
     const root = findDOMNode(this) as HTMLElement;
     if (!root) {
       return;
     }
     const {renderer} = this.props;
-    const debugId = uuidv4();
-    root.setAttribute('data-debug-id', debugId);
-    ComponentInfo[debugId] = {
+    root.setAttribute('data-debug-id', this.debugId);
+    ComponentInfo[this.debugId] = {
       name: renderer.name,
       component: this.props.children
     };
+  }
+
+  componentDidUpdate(prevProps: DebugWrapperProps) {
+    const {renderer} = this.props;
+    if (!ComponentInfo[this.debugId]) {
+      return;
+    }
+    ComponentInfo[this.debugId] = {
+      name: renderer.name,
+      component: this.props.children
+    };
+  }
+
+  componentWillUnmount() {
+    delete ComponentInfo[this.debugId];
   }
 
   render() {

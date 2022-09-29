@@ -2,7 +2,7 @@
   @include input-input();
   @include input-border();
   flex-wrap: nowrap;
-  padding: 0 px2rem(5px);
+  padding: 0 px2rem(12px);
   min-height: var(--Form-input-height);
   align-items: center;
   border-radius: 3px;
@@ -67,12 +67,9 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    padding-left: px2rem(5px);
 
     > * {
-      &:first-child {
-        margin-left: px2rem(5px);
-      }
-
       &:not(:last-child) {
         margin-right: px2rem(5px);
       }
@@ -80,7 +77,6 @@
   }
 
   &-singleValue {
-    padding: 0 calc(var(--Form-input-paddingX) - #{px2rem(3px)});
     flex-grow: 1;
     display: inline-block;
     max-width: 100%;
@@ -91,16 +87,15 @@
   &-pc-arrow {
     height: 100%;
     margin: auto 0;
-    position: absolute;
-    right: 10px;
     display: flex;
     align-items: center;
     transition: transform var(--animation-duration) ease;
     transform: rotate(90deg);
+
     > svg {
       width: px2rem(10px);
       height: px2rem(10px);
-      top: 0.125em;
+      top: 0;
       color: var(--default-icon-color);
     }
   }
@@ -157,6 +152,7 @@
       cursor: pointer;
       margin-left: px2rem(10px);
       color: var(--ResultBox-icon-color);
+
       &:hover {
         color: var(--ResultBox-icon--onHover-color);
       }
@@ -164,6 +160,7 @@
       > svg {
         width: px2rem(10px);
         height: px2rem(10px);
+
         &.icon {
           top: 0;
         }

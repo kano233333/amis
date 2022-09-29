@@ -40,6 +40,11 @@ export interface SelectControlSchema extends FormOptionsSchema {
   menuTpl?: string;
 
   /**
+   * 当在value值未匹配到当前options中的选项时，是否value值对应文本飘红显示
+   */
+  showInvalidMatch: boolean;
+
+  /**
    * 边框模式，全边框，还是半边框，或者没边框。
    */
   borderMode?: 'full' | 'half' | 'none';
@@ -131,6 +136,7 @@ export interface SelectControlSchema extends FormOptionsSchema {
 export interface SelectProps extends OptionsControlProps {
   autoComplete?: Api;
   searchable?: boolean;
+  showInvalidMatch?: boolean;
   defaultOpen?: boolean;
   useMobileUI?: boolean;
   maxTagCount?: number;
@@ -148,7 +154,8 @@ export default class SelectControl extends React.Component<SelectProps, any> {
   static defaultProps: Partial<SelectProps> = {
     clearable: false,
     searchable: false,
-    multiple: false
+    multiple: false,
+    showInvalidMatch: false
   };
 
   input: any;
@@ -194,11 +201,13 @@ export default class SelectControl extends React.Component<SelectProps, any> {
     this.input && this.input.focus();
   }
 
-  getValue(value: Option | Array<Option> | string | void) {
+  getValue(
+    value: Option | Array<Option> | string | void,
+    additonalOptions: Array<any> = []
+  ) {
     const {joinValues, extractValue, delimiter, multiple, valueField, options} =
       this.props;
     let newValue: string | Option | Array<Option> | void = value;
-    let additonalOptions: Array<any> = [];
 
     (Array.isArray(value) ? value : value ? [value] : []).forEach(
       (option: any) => {
@@ -261,8 +270,12 @@ export default class SelectControl extends React.Component<SelectProps, any> {
   async changeValue(value: Option | Array<Option> | string | void) {
     const {onChange, setOptions, options, data, dispatchEvent} = this.props;
 
-    let newValue: string | Option | Array<Option> | void = this.getValue(value);
     let additonalOptions: Array<any> = [];
+    let newValue: string | Option | Array<Option> | void = this.getValue(
+      value,
+      additonalOptions
+    );
+
     // 不设置没法回显
     additonalOptions.length && setOptions(options.concat(additonalOptions));
 
@@ -395,6 +408,7 @@ export default class SelectControl extends React.Component<SelectProps, any> {
     let {
       autoComplete,
       searchable,
+      showInvalidMatch,
       options,
       className,
       loading,
@@ -450,6 +464,7 @@ export default class SelectControl extends React.Component<SelectProps, any> {
             loadOptions={
               isEffectiveApi(autoComplete) ? this.lazyloadRemote : undefined
             }
+            showInvalidMatch={showInvalidMatch}
             creatable={creatable}
             searchable={searchable || !!autoComplete}
             onChange={this.changeValue}
@@ -511,7 +526,8 @@ class TransferDropdownRenderer extends BaseTransferRenderer<TransferDropDownProp
       useMobileUI,
       popOverContainer,
       maxTagCount,
-      overflowTagPopover
+      overflowTagPopover,
+      placeholder
     } = this.props;
 
     // 目前 LeftOptions 没有接口可以动态加载
@@ -521,7 +537,7 @@ class TransferDropdownRenderer extends BaseTransferRenderer<TransferDropDownProp
     if (
       selectMode === 'associated' &&
       options &&
-      options.length === 1 &&
+      options.length &&
       options[0].leftOptions &&
       Array.isArray(options[0].children)
     ) {
@@ -557,6 +573,7 @@ class TransferDropdownRenderer extends BaseTransferRenderer<TransferDropDownProp
           popOverContainer={popOverContainer}
           maxTagCount={maxTagCount}
           overflowTagPopover={overflowTagPopover}
+          placeholder={placeholder}
         />
 
         <Spinner overlay key="info" show={loading} />

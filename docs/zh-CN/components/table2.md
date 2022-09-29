@@ -1,5 +1,5 @@
 ---
-title: Table v2 表格
+title: Table2 表格
 description:
 type: 0
 group: ⚙ 组件
@@ -18,25 +18,25 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "title": "表格标题",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -60,7 +60,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -69,19 +69,19 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -100,7 +100,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -110,19 +110,19 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -141,7 +141,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -151,23 +151,23 @@ order: 67
             "columns": [
                 {
                     "title": "ID",
-                    "key": "id"
+                    "name": "id"
                 },
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -186,7 +186,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -196,23 +196,23 @@ order: 67
             "columns": [
                 {
                     "title": "ID",
-                    "key": "id"
+                    "name": "id"
                 },
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -233,7 +233,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "radio",
@@ -243,15 +243,15 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 }
             ]
         }
@@ -269,7 +269,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -300,19 +300,62 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
+                    "type": "button",
+                    "label": "删除",
+                    "size": "sm"
+                }
+            ]
+        }
+    ]
+}
+```
+
+### 最大选择个数
+
+可通过设置`maxKeepItemSelectionLength`控制表格可选中的最大个数
+
+```schema: scope="body"
+{
+    "type": "service",
+    "api": "/api/sample?perPage=5",
+    "body": [
+        {
+            "type": "table2",
+            "source": "$rows",
+            "maxKeepItemSelectionLength": 2,
+            "rowSelection": {
+                "type": "checkbox",
+                "keyField": "id"
+            },
+            "columns": [
+                {
+                    "title": "Engine",
+                    "name": "engine"
+                },
+                {
+                    "title": "Version",
+                    "name": "version"
+                },
+                {
+                    "title": "Browser",
+                    "name": "browser"
+                },
+                {
+                    "title": "Operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -331,12 +374,12 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "sorter": true,
                     "filterMultiple": true,
                     "filters": [
@@ -352,13 +395,13 @@ order: 67
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "sorter": true,
                     "width": 100
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "filters": [
                         {
                             "text": "Joe",
@@ -384,7 +427,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "bordered": true,
             "title": "标题",
@@ -392,19 +435,19 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -423,24 +466,24 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -450,14 +493,15 @@ order: 67
                 "expandableOn": "this.record.id === 1 || this.record.id === 3",
                 "keyField": "id",
                 "expandedRowClassNameExpr": "<%= data.rowIndex % 2 ? 'bg-success' : '' %>",
-                "expandedRowKeys": ["3"]
-            },
-            "expandableBody": [
-                {
-                    "type": "tpl",
-                    "html": "<div class=\"test\">测试测试</div>"
-                }
-            ]
+                "expandedRowKeys": ["3"],
+                "type": "container",
+                "body": [
+                    {
+                        "type": "tpl",
+                        "html": "<div class=\"test\">测试测试</div>"
+                    }
+                ]
+            }
         }
     ]
 }
@@ -471,24 +515,24 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -498,14 +542,15 @@ order: 67
                 "expandableOn": "this.record.id === 1 || this.record.id === 3",
                 "keyField": "id",
                 "expandedRowClassNameExpr": "<%= data.rowIndex % 2 ? 'bg-success' : '' %>",
-                "expandedRowKeysExpr": "data.record.id == '3'"
-            },
-            "expandableBody": [
-                {
-                    "type": "tpl",
-                    "html": "<div class=\"test\">测试测试</div>"
-                }
-            ]
+                "expandedRowKeysExpr": "data.record.id == '3'",
+                "type": "container",
+                "body": [
+                    {
+                        "type": "tpl",
+                        "html": "<div class=\"test\">测试测试</div>"
+                    }
+                ]
+            }
         }
     ]
 }
@@ -519,34 +564,34 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "rowSpanExpr": "<%= data.rowIndex === 2 ? 2 : 0 %>"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText",
+                    "name": "badgeText",
                     "colSpanExpr": "<%= data.rowIndex === 6 ? 3 : 0 %>"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -562,21 +607,21 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"y" : 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -592,37 +637,37 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"x": 1000},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "fixed": "left",
                     "width": 100
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "fixed": "left",
                     "width": 100
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform",
+                    "name": "platform",
                     "fixed": "right"
                 }
             ]
@@ -639,37 +684,37 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"x": 1000, "y": 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "fixed": "left",
                     "width": 100
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "fixed": "left",
                     "width": 100
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform",
+                    "name": "platform",
                     "fixed": "right"
                 }
             ]
@@ -686,37 +731,37 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"y": 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Grade1",
-                    "key": "grade1",
+                    "name": "grade1",
                     "children": [
                         {
                             "title": "Browser",
-                            "key": "browser"
+                            "name": "browser"
                         },
                         {
                             "title": "Badge",
-                            "key": "badgeText",
+                            "name": "badgeText",
                             "children": [
                                 {
                                     "title": "ID",
-                                    "key": "id"
+                                    "name": "id"
                                 }
                             ]
                         }
@@ -724,7 +769,7 @@ order: 67
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -738,51 +783,51 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"y": 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Grade1",
-                    "key": "grade1",
+                    "name": "grade1",
                     "children": [
                         {
                             "title": "Browser",
-                            "key": "browser"
+                            "name": "browser"
                         }
                     ]
                 },
                 {
                     "title": "Platform1",
-                    "key": "platform1",
+                    "name": "platform1",
                     "children": [
                         {
                             "title": "Badge1",
-                            "key": "badgeText1",
+                            "name": "badgeText1",
                             "children": [
                                 {
                                     "title": "ID",
-                                    "key": "id"
+                                    "name": "id"
                                 },
                                 {
                                     "title": "Platform",
-                                    "key": "platform"
+                                    "name": "platform"
                                 },
                                 {
                                     "title": "Badge",
-                                    "key": "badgeText"
+                                    "name": "badgeText"
                                 }
                             ]
                         }
@@ -806,36 +851,36 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "draggable": true,
             "keyField": "id",
             "columns": [
                 {
                     "title": "ID",
-                    "key": "id"
+                    "name": "id"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText",
+                    "name": "badgeText",
                     "children": [
                         {
                             "title": "Engine",
-                            "key": "engine",
+                            "name": "engine",
                         }
                     ]
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -1006,27 +1051,27 @@ order: 67
         },
         "body":[
             {
-                "type":"table-v2",
+                "type":"table2",
                 "source":"$rows",
                 "columns":[
                     {
-                        "key":"engine",
+                        "name":"engine",
                         "title":"Engine"
                     },
                     {
-                        "key":"grade",
+                        "name":"grade",
                         "title":"Grade"
                     },
                     {
-                        "key":"browser",
+                        "name":"browser",
                         "title":"Browser"
                     },
                     {
-                        "key":"id",
+                        "name":"id",
                         "title":"ID"
                     },
                     {
-                        "key":"platform",
+                        "name":"platform",
                         "title":"Platform"
                     }
                 ],
@@ -1048,33 +1093,33 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"y": 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "headSummary": [
@@ -1105,33 +1150,33 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"y": 200},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "headSummary": [
@@ -1171,35 +1216,35 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "bordered": true,
             "scroll": {"y": 200, "x": 1000},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "fixed": "left"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "footSummary": [
@@ -1227,35 +1272,35 @@ order: 67
     "api": "/api/sample?perPage=10",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "bordered": true,
             "scroll": {"y": 200, "x": 1000},
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "fixed": "left"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade"
+                    "name": "grade"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "footSummary": [
@@ -1290,40 +1335,40 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "scroll": {"x": 1000},
             "resizable": true,
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "width": 200,
                     "align": "center"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "width": 200,
                     "align": "right"
                 },
                 {
                     "title": "Grade",
-                    "key": "grade",
+                    "name": "grade",
                     "width": 200
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "width": 200
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -1339,40 +1384,40 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columnsTogglable": true,
             "title": "表格的标题",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "width": 200
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "width": 200
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "width": 200,
                     "children": [
                         {
                             "title": "Grade",
-                            "key": "grade",
+                            "name": "grade",
                             "width": 200
                         }
                     ]
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -1384,40 +1429,40 @@ order: 67
 
 ```schema
 {
-    "type": "table-v2",
+    "type": "table2",
     "data": {
         "items": []
     },
     "columns": [
         {
             "title": "Engine",
-            "key": "engine",
+            "name": "engine",
             "width": 200
         },
         {
             "title": "Version",
-            "key": "version",
+            "name": "version",
             "width": 200
         },
         {
             "title": "Browser",
-            "key": "browser",
+            "name": "browser",
             "width": 200,
             "children": [
                 {
                     "title": "Grade",
-                    "key": "grade",
+                    "name": "grade",
                     "width": 200
                 }
             ]
         },
         {
             "title": "Platform",
-            "key": "platform",
+            "name": "platform",
             "children": [
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 }
             ]
         }
@@ -1430,38 +1475,38 @@ order: 67
 
 ```schema
 {
-    "type": "table-v2",
+    "type": "table2",
     "data": {
         "items": []
     },
     "columns": [
         {
             "title": "Engine",
-            "key": "engine",
+            "name": "engine",
             "width": 200
         },
         {
             "title": "Version",
-            "key": "version",
+            "name": "version",
             "width": 200
         },
         {
             "title": "Browser",
-            "key": "browser",
+            "name": "browser",
             "width": 200,
             "children": [
                 {
                     "title": "Grade",
-                    "key": "grade",
+                    "name": "grade",
                     "width": 200
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText",
+                    "name": "badgeText",
                     "children": [
                         {
                             "title": "Platform",
-                            "key": "platform"
+                            "name": "platform"
                         }
                     ]
                 }
@@ -1637,31 +1682,31 @@ order: 67
         },
         "body":[
             {
-                "type":"table-v2",
+                "type":"table2",
                 "source":"$rows",
                 "columns":[
                     {
-                        "key":"engine",
+                        "name":"engine",
                         "title":"Engine"
                     },
                     {
-                        "key":"grade",
+                        "name":"grade",
                         "title":"Grade"
                     },
                     {
-                        "key":"version",
+                        "name":"version",
                         "title":"Version"
                     },
                     {
-                        "key":"browser",
+                        "name":"browser",
                         "title":"Browser"
                     },
                     {
-                        "key":"id",
+                        "name":"id",
                         "title":"ID"
                     },
                     {
-                        "key":"platform",
+                        "name":"platform",
                         "title":"Platform"
                     }
                 ],
@@ -1835,31 +1880,31 @@ order: 67
         },
         "body":[
             {
-                "type":"table-v2",
+                "type":"table2",
                 "source":"$rows",
                 "columns":[
                     {
-                        "key":"engine",
+                        "name":"engine",
                         "title":"Engine"
                     },
                     {
-                        "key":"grade",
+                        "name":"grade",
                         "title":"Grade"
                     },
                     {
-                        "key":"version",
+                        "name":"version",
                         "title":"Version"
                     },
                     {
-                        "key":"browser",
+                        "name":"browser",
                         "title":"Browser"
                     },
                     {
-                        "key":"id",
+                        "name":"id",
                         "title":"ID"
                     },
                     {
-                        "key":"platform",
+                        "name":"platform",
                         "title":"Platform"
                     }
                 ],
@@ -2037,31 +2082,31 @@ order: 67
         },
         "body":[
             {
-                "type":"table-v2",
+                "type":"table2",
                 "source":"$rows",
                 "columns":[
                     {
-                        "key":"engine",
+                        "name":"engine",
                         "title":"Engine"
                     },
                     {
-                        "key":"grade",
+                        "name":"grade",
                         "title":"Grade"
                     },
                     {
-                        "key":"version",
+                        "name":"version",
                         "title":"Version"
                     },
                     {
-                        "key":"browser",
+                        "name":"browser",
                         "title":"Browser"
                     },
                     {
-                        "key":"id",
+                        "name":"id",
                         "title":"ID"
                     },
                     {
-                        "key":"platform",
+                        "name":"platform",
                         "title":"Platform"
                     }
                 ],
@@ -2237,31 +2282,31 @@ order: 67
         },
         "body":[
             {
-                "type":"table-v2",
+                "type":"table2",
                 "source":"$rows",
                 "columns":[
                     {
-                        "key":"engine",
+                        "name":"engine",
                         "title":"Engine"
                     },
                     {
-                        "key":"grade",
+                        "name":"grade",
                         "title":"Grade"
                     },
                     {
-                        "key":"version",
+                        "name":"version",
                         "title":"Version"
                     },
                     {
-                        "key":"browser",
+                        "name":"browser",
                         "title":"Browser"
                     },
                     {
-                        "key":"id",
+                        "name":"id",
                         "title":"ID"
                     },
                     {
-                        "key":"platform",
+                        "name":"platform",
                         "title":"Platform"
                     }
                 ],
@@ -2285,39 +2330,39 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "width": 200
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "width": 200,
                     "searchable": true
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "width": 200,
                     "children": [
                         {
                             "title": "Grade",
-                            "key": "grade",
+                            "name": "grade",
                             "width": 200
                         }
                     ]
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -2333,39 +2378,39 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "title": "表格的标题",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "width": 200
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "width": 200
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "width": 200,
                     "children": [
                         {
                             "title": "Grade",
-                            "key": "grade",
+                            "name": "grade",
                             "width": 200
                         }
                     ]
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "sticky": true
@@ -2376,7 +2421,7 @@ order: 67
 
 ## 表格尺寸
 
-通过设置size属性来控制表格尺寸，支持`large`、`default`、`small`，`default`是中等尺寸
+通过设置 size 属性来控制表格尺寸，支持`large`、`default`、`small`，`default`是中等尺寸
 
 ### 最大尺寸
 
@@ -2388,7 +2433,7 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "size": "large",
             "rowSelection": {
@@ -2398,13 +2443,13 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "sorter": true,
                     "tpl": "${engine|truncate:5}"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "sorter": true,
                     "filterMultiple": true,
                     "filters": [
@@ -2421,17 +2466,17 @@ order: 67
                 {
                     "type": "tpl",
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "tpl": "${browser|truncate:5}",
                     "searchable": true
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "footSummary": [
@@ -2461,7 +2506,7 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "rowSelection": {
                 "type": "checkbox",
@@ -2470,13 +2515,13 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "sorter": true,
                     "tpl": "${engine|truncate:5}"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "sorter": true,
                     "filterMultiple": true,
                     "filters": [
@@ -2493,17 +2538,17 @@ order: 67
                 {
                     "type": "tpl",
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "tpl": "${engine|truncate:5}",
                     "searchable": true
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "footSummary": [
@@ -2533,7 +2578,7 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "size": "small",
             "rowSelection": {
@@ -2543,13 +2588,13 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "sorter": true,
                     "tpl": "${engine|truncate:5}"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "sorter": true,
                     "filterMultiple": true,
                     "filters": [
@@ -2566,17 +2611,17 @@ order: 67
                 {
                     "type": "tpl",
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "tpl": "${engine|truncate:5}",
                     "searchable": true
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ],
             "footSummary": [
@@ -2604,32 +2649,32 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "title": "表格的标题",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine",
+                    "name": "engine",
                     "width": 200
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "copyable": true
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "width": 200
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -2647,20 +2692,20 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "copyable": true,
                     "popOver": {
                         "body": {
@@ -2671,11 +2716,11 @@ order: 67
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -2683,7 +2728,7 @@ order: 67
 }
 ```
 
-也可以设置图标不展示，结合truncate实现内容自动省略，其余可点击/悬浮查看更多
+也可以设置图标不展示，结合 truncate 实现内容自动省略，其余可点击/悬浮查看更多
 
 ```schema: scope="body"
 {
@@ -2691,21 +2736,21 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "type": "tpl",
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "tpl": "${engine|truncate:5}",
                     "popOver": {
                         "trigger": "hover",
@@ -2719,11 +2764,11 @@ order: 67
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -2739,12 +2784,12 @@ order: 67
     "api": "/api/sample?perPage=6",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "ID",
-                    "key": "id",
+                    "name": "id",
                     "popOver": {
                         "body": {
                             "type": "tpl",
@@ -2755,15 +2800,15 @@ order: 67
                 },
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser",
+                    "name": "browser",
                     "popOver": {
                         "body": {
                             "type": "tpl",
@@ -2773,11 +2818,11 @@ order: 67
                 },
                 {
                     "title": "Badge",
-                    "key": "badgeText"
+                    "name": "badgeText"
                 },
                 {
                     "title": "Platform",
-                    "key": "platform"
+                    "name": "platform"
                 }
             ]
         }
@@ -2793,7 +2838,7 @@ order: 67
 {
   "type": "service",
   "body": {
-    "type": "table-v2",
+    "type": "table2",
     "source": "${table}",
     "syncLocation": false,
     "showBadge": true,
@@ -2806,7 +2851,7 @@ order: 67
     },
     "columns": [
         {
-            "key": "id",
+            "name": "id",
             "title": "ID",
             "searchable": {
               "type": "input-text",
@@ -2817,11 +2862,11 @@ order: 67
             }
         },
         {
-            "key": "engine",
+            "name": "engine",
             "title": "Rendering engine"
         },
         {
-            "key": "browser",
+            "name": "browser",
             "title": "Browser",
             "searchable": {
               "type": "select",
@@ -2846,11 +2891,11 @@ order: 67
             }
         },
         {
-            "key": "platform",
+            "name": "platform",
             "title": "Platform(s)"
         },
         {
-            "key": "version",
+            "name": "version",
             "title": "Engine version",
             "searchable": {
               "type": "input-number",
@@ -2862,7 +2907,7 @@ order: 67
             }
         },
         {
-            "key": "grade",
+            "name": "grade",
             "title": "CSS grade"
         }
     ]
@@ -2930,33 +2975,33 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
       {
-        "type": "table-v2",
+        "type": "table2",
         "source": "$rows",
         "columns": [
           {
             "title": "Engine",
-            "key": "engine",
+            "name": "engine",
             "remark": "表头提示"
           },
           {
             "title": "Version",
-            "key": "version"
+            "name": "version"
           },
           {
             "title": "Browser",
-            "key": "browser"
+            "name": "browser"
           },
           {
             "title": "Badge",
-            "key": "badgeText"
+            "name": "badgeText"
           },
           {
             "title": "Grade",
-            "key": "grade"
+            "name": "grade"
           },
           {
             "title": "Platform",
-            "key": "platform"
+            "name": "platform"
           }
         ]
       }
@@ -2967,7 +3012,7 @@ order: 67
 
 ## 快速编辑
 
-可以通过给列配置：`"quickEdit": true`，Table配置：`quickSaveApi`，可以实现表格内快速编辑并批量保存的功能。
+可以通过给列配置：`"quickEdit": true`，Table 配置：`quickSaveApi`，可以实现表格内快速编辑并批量保存的功能。
 
 ```schema: scope="body"
 {
@@ -2977,7 +3022,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
       {
-        "type": "table-v2",
+        "type": "table2",
         "source": "$rows",
         "quickSaveApi": {
             "url": "/api/mock2/sample/bulkUpdate",
@@ -2986,20 +3031,20 @@ order: 67
         "columns": [
           {
             "title": "Engine",
-            "key": "engine",
+            "name": "engine",
             "quickEdit": true
           },
           {
             "title": "Version",
-            "key": "version"
+            "name": "version"
           },
           {
             "title": "Browser",
-            "key": "browser"
+            "name": "browser"
           },
           {
             "title": "Badge",
-            "key": "badgeText"
+            "name": "badgeText"
           }
         ]
       }
@@ -3020,7 +3065,7 @@ order: 67
         "api": "/api/sample?perPage=5",
         "body": [
             {
-                "type": "table-v2",
+                "type": "table2",
                 "source": "$rows",
                 "quickSaveApi": {
                     "url": "/api/mock2/sample/bulkUpdate",
@@ -3028,11 +3073,11 @@ order: 67
                 },
                 "columns": [
                     {
-                        "key": "id",
+                        "name": "id",
                         "title": "ID"
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "type": "select",
@@ -3062,7 +3107,7 @@ order: 67
         "api": "/api/sample?perPage=5",
         "body": [
             {
-                "type": "table-v2",
+                "type": "table2",
                 "source": "$rows",
                 "quickSaveApi": {
                     "url": "/api/mock2/sample/bulkUpdate",
@@ -3070,11 +3115,11 @@ order: 67
                 },
                 "columns": [
                     {
-                        "key": "id",
+                        "name": "id",
                         "title": "ID"
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "body": [
@@ -3117,7 +3162,7 @@ order: 67
         "api": "/api/sample?perPage=5",
         "body": [
             {
-                "type": "table-v2",
+                "type": "table2",
                 "source": "$rows",
                 "quickSaveApi": {
                     "url": "/api/mock2/sample/bulkUpdate",
@@ -3125,11 +3170,11 @@ order: 67
                 },
                 "columns": [
                     {
-                        "key": "id",
+                        "name": "id",
                         "title": "ID"
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "mode": "inline",
@@ -3145,7 +3190,7 @@ order: 67
                         }
                     },
                     {
-                        "key": "switch",
+                        "name": "switch",
                         "title": "switch",
                         "quickEdit": {
                             "mode": "inline",
@@ -3173,7 +3218,7 @@ order: 67
         "api": "/api/sample?perPage=5",
         "body": [
             {
-                "type": "table-v2",
+                "type": "table2",
                 "source": "$rows",
                 "quickSaveItemApi": {
                     "url": "/api/mock2/sample/$id",
@@ -3181,11 +3226,11 @@ order: 67
                 },
                 "columns": [
                     {
-                        "key": "id",
+                        "name": "id",
                         "title": "ID"
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "mode": "inline",
@@ -3202,7 +3247,7 @@ order: 67
                         }
                     },
                     {
-                        "key": "switch",
+                        "name": "switch",
                         "title": "switch",
                         "quickEdit": {
                             "mode": "inline",
@@ -3229,15 +3274,15 @@ order: 67
         "api": "/api/sample?perPage=5",
         "body": [
             {
-                "type": "table-v2",
+                "type": "table2",
                 "source": "$rows",
                 "columns": [
                     {
-                        "key": "id",
+                        "name": "id",
                         "title": "ID"
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "mode": "inline",
@@ -3256,14 +3301,16 @@ order: 67
                         }
                     },
                     {
-                        "key": "grade",
+                        "name": "grade",
                         "title": "CSS grade",
                         "quickEdit": {
                             "mode": "inline",
                             "type": "switch",
                             "onText": "开启",
                             "offText": "关闭",
-                            "saveImmediately": true
+                            "saveImmediately": {
+                                "api": "/api/mock2/sample/$id"
+                            }
                         }
                     }
                 ]
@@ -3283,25 +3330,25 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "className": "text-primary"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -3320,26 +3367,26 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "className": "text-primary",
                     "titleClassName": "font-bold"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -3352,7 +3399,7 @@ order: 67
 
 ## 单元格样式
 
-可以通过设置`columns`的`classNameExpr`，根据数据动态添加单元格CSS类，支持模版语法
+可以通过设置`columns`的`classNameExpr`，根据数据动态添加单元格 CSS 类，支持模版语法
 
 ```schema: scope="body"
 {
@@ -3360,25 +3407,25 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version",
+                    "name": "version",
                     "classNameExpr": "<%= data.version > 5 ? 'text-danger' : '' %>"
                 },
                 {
                     "title": "Browser",
-                    "key": "browser"
+                    "name": "browser"
                 },
                 {
                     "title": "Operation",
-                    "key": "operation",
+                    "name": "operation",
                     "type": "button",
                     "label": "删除",
                     "size": "sm"
@@ -3399,7 +3446,7 @@ order: 67
     "api": "/api/sample?perPage=5",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "itemActions": [
                 {
@@ -3422,11 +3469,11 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 }
             ]
         }
@@ -3442,7 +3489,7 @@ order: 67
     "api": "/api/sample?perPage=20",
     "body": [
         {
-            "type": "table-v2",
+            "type": "table2",
             "source": "$rows",
             "itemActions": [
                 {
@@ -3468,11 +3515,11 @@ order: 67
             "columns": [
                 {
                     "title": "Engine",
-                    "key": "engine"
+                    "name": "engine"
                 },
                 {
                     "title": "Version",
-                    "key": "version"
+                    "name": "version"
                 }
             ]
         }
@@ -3487,15 +3534,15 @@ order: 67
 | type             | `string`                                 |                           | `"type"` 指定为 table 渲染器                                              |
 | title            | `string`                                 |                           | 标题                                                                      |
 | source           | `string`                                 | `${items}`                | 数据源, 绑定当前环境变量                                                  |
-| sticky      | `boolean`                                | `false`                    | 是否粘性头部 
-| footer      | `string` \| `Schema`                         |                    | 表格尾部                                                         |
-| loading      | `boolean`                         |                    | 表格是否加载中                                                         |
+| sticky           | `boolean`                                | `false`                   | 是否粘性头部                                                              |
+| footer           | `string` \| `Schema`                     |                           | 表格尾部                                                                  |
+| loading          | `boolean`                                |                           | 表格是否加载中                                                            |
 | columnsTogglable | `auto` 或者 `boolean`                    | `auto`                    | 展示列显示开关, 自动即：列数量大于或等于 5 个时自动开启                   |
-| placeholder      | `string` \| `Schema`           | `暂无数据`                | 当没数据的时候的文字提示  
-| rowSelection      | `rowSelection`                                   |                | 行相关配置                                                 |
-| rowClassNameExpr        | `string`               |          | 行 CSS 类名，支持模版语法                                                           |
-| expandable   | `Expandable`                      |  | 展开行配置                                                             |
-| lineHeight  | `large` \| `middle`         |  | 行高设置                                                         |
+| placeholder      | `string` \| `Schema`                     | `暂无数据`                | 当没数据的时候的文字提示                                                  |
+| rowSelection     | `rowSelection`                           |                           | 行相关配置                                                                |
+| rowClassNameExpr | `string`                                 |                           | 行 CSS 类名，支持模版语法                                                 |
+| expandable       | `Expandable`                             |                           | 展开行配置                                                                |
+| lineHeight       | `large` \| `middle`                      |                           | 行高设置                                                                  |
 | footerClassName  | `string`                                 | `Action.md-table-footer`  | 底部外层 CSS 类名                                                         |
 | toolbarClassName | `string`                                 | `Action.md-table-toolbar` | 工具栏 CSS 类名                                                           |
 | columns          | `Array<Column>`                          |                           | 用来设置列信息                                                            |
@@ -3513,36 +3560,36 @@ order: 67
 
 ## 行配置属性表
 
-| 属性名     | 类型                                          | 默认值  | 说明             |
-| ---------- | --------------------------------------------- | ------- | ---------------- |
-| type      | `checkbox` \| `radio`        |  `checkbox`       | 指定单选还是多选     |
-| fixed     | `boolean`                    |                   | 选择列是否固定，只能左侧固定 |
-| keyField      | `string`                   | `key`        | 对应数据源的key值，默认是`key`，可指定为`id`、`shortId`等   |
-| disableOn    |  `string`                   |         | 当前行是否可选择条件，要用 [表达式](../../docs/concepts/expression)           |
-| selections  | `selections`                 |         | 自定义筛选菜单，内置`all`（全选）、`invert`（反选）、`none`（取消选择）、`odd`（选择奇数项）、`even`（选择偶数项）         |
-| selectedRowKeys   | `Array<string | number>` |         | 已选择项       |
-| selectedRowKeysExpr   | `string`             |         | 已选择项正则表达式       |
-| columnWidth   | `number`             |         | 自定义选择列列宽      |
-| rowClick   | `boolean`             |         | 单条任意区域选中      |
+| 属性名              | 类型                               | 默认值     | 说明                                                                                                               |
+| ------------------- | ---------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| type                | `checkbox` \| `radio`              | `checkbox` | 指定单选还是多选                                                                                                   |
+| fixed               | `boolean`                          |            | 选择列是否固定，只能左侧固定                                                                                       |
+| keyField            | `string`                           | `key`      | 对应数据源的 key 值，默认是`key`，可指定为`id`、`shortId`等                                                        |
+| disableOn           | `string`                           |            | 当前行是否可选择条件，要用 [表达式](../../docs/concepts/expression)                                                |
+| selections          | `selections`                       |            | 自定义筛选菜单，内置`all`（全选）、`invert`（反选）、`none`（取消选择）、`odd`（选择奇数项）、`even`（选择偶数项） |
+| selectedRowKeys     | `Array<string>` \| `Array<number>` |            | 已选择项                                                                                                           |
+| selectedRowKeysExpr | `string`                           |            | 已选择项正则表达式                                                                                                 |
+| columnWidth         | `number`                           |            | 自定义选择列列宽                                                                                                   |
+| rowClick            | `boolean`                          |            | 单条任意区域选中                                                                                                   |
 
 ### 选择菜单配置属性表
 
-| 属性名     | 类型                                          | 默认值  | 说明             |
-| ---------- | --------------------------------------------- | ------- | ---------------- |
-| key      | `all` \| `invert` \| `none` \| `odd` \| `even`        |  `all`       | 菜单类型，内置全选、反选、取消选择、选择奇数项、选择偶数项     |
-| text       | `string`                                      |         | 自定义菜单项文本 |
+| 属性名 | 类型                                           | 默认值 | 说明                                                       |
+| ------ | ---------------------------------------------- | ------ | ---------------------------------------------------------- |
+| key    | `all` \| `invert` \| `none` \| `odd` \| `even` | `all`  | 菜单类型，内置全选、反选、取消选择、选择奇数项、选择偶数项 |
+| text   | `string`                                       |        | 自定义菜单项文本                                           |
 
 ## 展开行配置属性表
 
-| 属性名     | 类型                                          | 默认值  | 说明             |
-| ---------- | --------------------------------------------- | ------- | ---------------- |
-| expandableOn     | `string`                    |                   | 指定可展开的行，要用 [表达式](../../docs/concepts/expression) |
-| keyField      | `string`                   | `key`        | 对应数据源的key值，默认是`key`，可指定为`id`、`shortId`等   |
-| disableOn    |  `string`                   |         | 当前行是否可选择条件，要用 [表达式](../../docs/concepts/expression)           |
-| selections  | `selections`                 |         | 自定义筛选菜单，内置`all`（全选）、`invert`（反选）、`none`（取消选择）、`odd`（选择奇数项）、`even`（选择偶数项）         |
-| selectedRowKeys   | `Array<string | number>` |         | 已选择项       |
-| selectedRowKeysExpr   | `string`             |         | 已选择项正则表达式       |
-| columnWidth   | `number`             |         | 自定义选择列列宽      |
+| 属性名              | 类型                               | 默认值 | 说明                                                                                                               |
+| ------------------- | ---------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| expandableOn        | `string`                           |        | 指定可展开的行，要用 [表达式](../../docs/concepts/expression)                                                      |
+| keyField            | `string`                           | `key`  | 对应数据源的 key 值，默认是`key`，可指定为`id`、`shortId`等                                                        |
+| disableOn           | `string`                           |        | 当前行是否可选择条件，要用 [表达式](../../docs/concepts/expression)                                                |
+| selections          | `selections`                       |        | 自定义筛选菜单，内置`all`（全选）、`invert`（反选）、`none`（取消选择）、`odd`（选择奇数项）、`even`（选择偶数项） |
+| selectedRowKeys     | `Array<string>` \| `Array<number>` |        | 已选择项                                                                                                           |
+| selectedRowKeysExpr | `string`                           |        | 已选择项正则表达式                                                                                                 |
+| columnWidth         | `number`                           |        | 自定义选择列列宽                                                                                                   |
 
 ## 列配置属性表
 

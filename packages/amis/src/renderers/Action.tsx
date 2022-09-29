@@ -568,6 +568,8 @@ export interface ActionProps
     e: React.MouseEvent<any> | void | null,
     action: ActionSchema
   ) => void;
+  // 可以用来监控这个动作的执行结果，包括成功与失败。
+  onActionSensor?: (promise?: Promise<any>) => void;
   isCurrentUrl?: (link: string) => boolean;
   onClick?:
     | ((e: React.MouseEvent<any>, props: any) => void)
@@ -629,7 +631,7 @@ export class Action extends React.Component<ActionProps, ActionState> {
 
   @autobind
   async handleAction(e: React.MouseEvent<any>) {
-    const {onAction, disabled, countDown, env} = this.props;
+    const {onAction, onActionSensor, disabled, countDown, env} = this.props;
     // https://reactjs.org/docs/legacy-event-pooling.html
     e.persist(); // 等 react 17之后去掉 event pooling 了，这个应该就没用了
     let onClick = this.props.onClick;
@@ -677,7 +679,12 @@ export class Action extends React.Component<ActionProps, ActionState> {
       (action as AjaxActionSchema).api = api;
     }
 
-    await onAction(e, action);
+    const sensor: any = onAction(e, action);
+    if (sensor?.then) {
+      onActionSensor?.(sensor);
+      await sensor;
+    }
+
     if (countDown) {
       const countDownEnd = Date.now() + countDown * 1000;
       this.setState({
@@ -841,8 +848,8 @@ export class Action extends React.Component<ActionProps, ActionState> {
         disabled={disabled}
         componentClass={isMenuItem ? 'a' : componentClass}
         overrideClassName={isMenuItem}
-        tooltip={tooltip}
-        disabledTip={disabledTip}
+        tooltip={filterContents(tooltip, data)}
+        disabledTip={filterContents(disabledTip, data)}
         tooltipPlacement={tooltipPlacement}
         tooltipContainer={tooltipContainer}
         tooltipTrigger={tooltipTrigger}
@@ -910,14 +917,17 @@ export class ActionRenderer extends React.Component<ActionRendererProps> {
     e: React.MouseEvent<any> | string | void | null,
     action: any
   ) {
-    const {env, onAction, data, ignoreConfirm, dispatchEvent} = this.props;
+    const {env, onAction, data, ignoreConfirm, dispatchEvent, $schema} =
+      this.props;
     let mergedData = data;
 
     if (action?.actionType === 'click' && isObject(action?.args)) {
       mergedData = createObject(data, action.args);
     }
 
-    if (!ignoreConfirm && action.confirmText && env.confirm) {
+    const hasOnEvent = $schema.onEvent && Object.keys($schema.onEvent).length;
+    // 有些组件虽然要求这里忽略二次确认，但是如果配了事件动作还是需要在这里等待二次确认提交才可以
+    if ((!ignoreConfirm || hasOnEvent) && action.confirmText && env.confirm) {
       let confirmed = await env.confirm(filter(action.confirmText, mergedData));
       if (confirmed) {
         // 触发渲染器事件
@@ -931,7 +941,8 @@ export class ActionRenderer extends React.Component<ActionRendererProps> {
           return;
         }
 
-        await onAction(e, action, mergedData);
+        // 因为crud里面也会处理二次确认，所以如果按钮处理过了就跳过crud的二次确认
+        await onAction(e, {...action, ignoreConfirm: !!hasOnEvent}, mergedData);
       } else if (action.countDown) {
         throw new Error('cancel');
       }

@@ -1,8 +1,8 @@
 import React = require('react');
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import '../../src';
 import {render as amisRender} from '../../src';
-import {makeEnv} from '../helper';
+import {makeEnv, wait} from '../helper';
 import rows from '../mockData/rows';
 
 test('Renderer:table', () => {
@@ -308,56 +308,66 @@ test('Renderer:table children', () => {
   expect(container).toMatchSnapshot();
 });
 
-// 合并单元格
-test('Renderer:table combineNum', () => {
-  const {container} = render(
-    amisRender(
-      {
-        type: 'page',
-        body: {
-          type: 'service',
-          data: {
-            rows
-          },
-          body: [
-            {
-              type: 'table',
-              source: '$rows',
-              className: 'm-b-none',
-              combineNum: 3,
-              columnsTogglable: false,
-              columns: [
-                {
-                  name: 'engine',
-                  label: 'Rendering engine'
-                },
-                {
-                  name: 'browser',
-                  label: 'Browser'
-                },
-                {
-                  name: 'platform',
-                  label: 'Platform(s)'
-                },
-                {
-                  name: 'version',
-                  label: 'Engine version'
-                },
-                {
-                  name: 'grade',
-                  label: 'CSS grade'
-                }
-              ]
-            }
-          ]
-        }
+describe('Renderer:table combine', () => {
+  const generateCombineSchema = (tableConfig: Record<string, any> = {}) => ({
+    type: 'page',
+    body: {
+      type: 'service',
+      data: {
+        rows
       },
-      {},
-      makeEnv({})
-    )
-  );
+      body: {
+        type: 'table',
+        source: '$rows',
+        combineNum: 3,
+        columnsTogglable: false,
+        columns: [
+          {
+            name: 'engine',
+            label: 'Rendering engine'
+          },
+          {
+            name: 'browser',
+            label: 'Browser'
+          },
+          {
+            name: 'platform',
+            label: 'Platform(s)'
+          },
+          {
+            name: 'version',
+            label: 'Engine version'
+          },
+          {
+            name: 'grade',
+            label: 'CSS grade'
+          }
+        ],
+        ...tableConfig
+      }
+    }
+  });
+  // 合并单元格
+  test('Renderer:table combineNum only', () => {
+    const {container} = render(
+      amisRender(generateCombineSchema(), {}, makeEnv({}))
+    );
 
-  expect(container).toMatchSnapshot();
+    expect(container).toMatchSnapshot();
+  });
+
+  // 合并单元格
+  test('Renderer:table combineNum with fromIndex', () => {
+    const {container} = render(
+      amisRender(
+        generateCombineSchema({combineNum: 2, combineFromIndex: 1}),
+        {},
+        makeEnv({})
+      )
+    );
+
+    expect(container).toMatchSnapshot();
+  });
 });
 
 // 超级表头
@@ -634,7 +644,7 @@ test('Renderer:table groupName-startNoGroupName', () => {
   expect(container).toMatchSnapshot();
 });
 
-test('Renderer:table column head style', () => {
+test('Renderer:table column head style className', () => {
   const {container} = render(
     amisRender(
       {
@@ -644,6 +654,11 @@ test('Renderer:table column head style', () => {
           items: rows
         },
         columnsTogglable: false,
+        className: 'className',
+        tableClassName: 'tableClassName',
+        headerClassName: 'headerClassName',
+        footerClassName: 'footerClassName',
+        toolbarClassName: 'toolbarClassName',
         columns: [
           {
             name: 'engine',
@@ -920,4 +935,49 @@ test('Renderer:table list', () => {
   );
 
   expect(container).toMatchSnapshot();
+});
+
+describe('Renderer:table selectable & itemCheckableOn', () => {
+  const schema: any = {
+    type: 'table',
+    title: '表格1',
+    selectable: true,
+    itemCheckableOn: '${__id != 1}',
+    data: {
+      items: rows
+    },
+    columns: [
+      {
+        name: 'engine',
+        label: 'Engine'
+      },
+      {
+        name: 'version',
+        label: 'Version'
+      }
+    ]
+  };
+
+  test('radio style', async () => {
+    const {container} = render(amisRender(schema, {}, makeEnv({})));
+    await waitFor(() => {
+      expect(container.querySelector('[type=radio]')).toBeInTheDocument();
+    });
+
+    expect(
+      container.querySelector('[data-id="1"] [type=radio][disabled=""]')!
+    ).toBeInTheDocument();
+  });
+
+  test('checkbox style', async () => {
+    schema.multiple = true;
+    const {container} = render(amisRender(schema, {}, makeEnv({})));
+    await waitFor(() => {
+      expect(container.querySelector('[type=checkbox]')).toBeInTheDocument();
+    });
+
+    expect(
+      container.querySelector('[data-id="1"] [type=checkbox][disabled=""]')!
+    ).toBeInTheDocument();
+  });
 });

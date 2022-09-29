@@ -391,7 +391,135 @@ exports[`Renderer:text type is email: validate success 1`] = `
 </div>
 `;
 
-exports[`Renderer:text type is password 1`] = `
+exports[`Renderer:text type is password with revealPassword 1`] = `
+<div>
+  <div
+    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
+    style="position: relative;"
+  >
+    <div
+      class="cxd-Panel-heading"
+    >
+      <h3
+        class="cxd-Panel-title"
+      >
+        <span
+          class="cxd-TplField"
+        >
+          <span>
+            表单
+          </span>
+        </span>
+      </h3>
+    </div>
+    <div
+      class="cxd-Panel-body"
+    >
+      <form
+        class="cxd-Form cxd-Form--normal"
+        novalidate=""
+      >
+        <input
+          style="display: none;"
+          type="submit"
+        />
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <label
+            class="cxd-Form-label"
+          >
+            <span>
+              <span
+                class="cxd-TplField"
+              >
+                <span>
+                  text
+                </span>
+              </span>
+            </span>
+          </label>
+          <div
+            class="cxd-Form-control cxd-TextControl"
+          >
+            <div
+              class="cxd-TextControl-input"
+            >
+              <input
+                autocomplete="off"
+                class=""
+                name="text"
+                placeholder=""
+                size="10"
+                type="password"
+                value="abcd"
+              />
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div
+      class="cxd-Panel-footerWrap"
+    >
+      <div
+        class="cxd-Panel-btnToolbar cxd-Panel-footer"
+      >
+        <button
+          class="cxd-Button cxd-Button--primary"
+          type="submit"
+        >
+          <span>
+            提交
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="resize-sensor"
+      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
+    >
+      
+  
+      <div
+        class="resize-sensor-expand"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-shrink"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-appear"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Renderer:text type is password: password invisible 1`] = `
 <div>
   <div
     class="cxd-Panel cxd-Panel--default cxd-Panel--form"
@@ -461,6 +589,142 @@ exports[`Renderer:text type is password 1`] = `
                 <icon-mock
                   classname="icon icon-invisible"
                   icon="invisible"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div
+      class="cxd-Panel-footerWrap"
+    >
+      <div
+        class="cxd-Panel-btnToolbar cxd-Panel-footer"
+      >
+        <button
+          class="cxd-Button cxd-Button--primary"
+          type="submit"
+        >
+          <span>
+            提交
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="resize-sensor"
+      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
+    >
+      
+  
+      <div
+        class="resize-sensor-expand"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-shrink"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-appear"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Renderer:text type is password: password visible 1`] = `
+<div>
+  <div
+    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
+    style="position: relative;"
+  >
+    <div
+      class="cxd-Panel-heading"
+    >
+      <h3
+        class="cxd-Panel-title"
+      >
+        <span
+          class="cxd-TplField"
+        >
+          <span>
+            表单
+          </span>
+        </span>
+      </h3>
+    </div>
+    <div
+      class="cxd-Panel-body"
+    >
+      <form
+        class="cxd-Form cxd-Form--normal"
+        novalidate=""
+      >
+        <input
+          style="display: none;"
+          type="submit"
+        />
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <label
+            class="cxd-Form-label"
+          >
+            <span>
+              <span
+                class="cxd-TplField"
+              >
+                <span>
+                  text
+                </span>
+              </span>
+            </span>
+          </label>
+          <div
+            class="cxd-Form-control cxd-TextControl"
+          >
+            <div
+              class="cxd-TextControl-input"
+            >
+              <input
+                autocomplete="off"
+                class="cxd-TextControl-input-password"
+                name="text"
+                placeholder=""
+                size="10"
+                type="text"
+                value="abcd"
+              />
+              <a
+                class="cxd-TextControl-revealPassword"
+              >
+                <icon-mock
+                  classname="icon icon-view"
+                  icon="view"
                 />
               </a>
             </div>
@@ -1390,6 +1654,7 @@ exports[`Renderer:text with counter and maxLength 1`] = `
               <input
                 autocomplete="off"
                 class=""
+                maxlength="10"
                 name="text"
                 placeholder=""
                 size="10"
@@ -1523,6 +1788,7 @@ exports[`Renderer:text with counter and maxLength 2`] = `
               <input
                 autocomplete="off"
                 class=""
+                maxlength="10"
                 name="text"
                 placeholder=""
                 size="10"
@@ -1536,6 +1802,143 @@ exports[`Renderer:text with counter and maxLength 2`] = `
               </span>
             </div>
           </div>
+        </div>
+      </form>
+    </div>
+    <div
+      class="cxd-Panel-footerWrap"
+    >
+      <div
+        class="cxd-Panel-btnToolbar cxd-Panel-footer"
+      >
+        <button
+          class="cxd-Button cxd-Button--primary"
+          type="submit"
+        >
+          <span>
+            提交
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="resize-sensor"
+      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
+    >
+      
+  
+      <div
+        class="resize-sensor-expand"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-shrink"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-appear"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Renderer:text with minLength 1`] = `
+<div>
+  <div
+    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
+    style="position: relative;"
+  >
+    <div
+      class="cxd-Panel-heading"
+    >
+      <h3
+        class="cxd-Panel-title"
+      >
+        <span
+          class="cxd-TplField"
+        >
+          <span>
+            表单
+          </span>
+        </span>
+      </h3>
+    </div>
+    <div
+      class="cxd-Panel-body"
+    >
+      <form
+        class="cxd-Form cxd-Form--normal"
+        novalidate=""
+      >
+        <input
+          style="display: none;"
+          type="submit"
+        />
+        <div
+          class="cxd-Form-item cxd-Form-item--normal is-error has-error--maxLength"
+          data-role="form-item"
+        >
+          <label
+            class="cxd-Form-label"
+          >
+            <span>
+              <span
+                class="cxd-TplField"
+              >
+                <span>
+                  text
+                </span>
+              </span>
+            </span>
+          </label>
+          <div
+            class="cxd-Form-control is-error has-error--maxLength cxd-TextControl"
+          >
+            <div
+              class="cxd-TextControl-input cxd-TextControl-input--borderHalf test-text-class-one"
+            >
+              <input
+                autocomplete="off"
+                class="test-text-class-two"
+                maxlength="8"
+                minlength="5"
+                name="text"
+                placeholder=""
+                size="10"
+                type="text"
+                value="123456789"
+              />
+            </div>
+          </div>
+          <ul
+            class="cxd-Form-feedback"
+          >
+            <li>
+              请控制内容长度, 不要输入 8 个以上字符
+            </li>
+          </ul>
         </div>
       </form>
     </div>
@@ -1630,11 +2033,6 @@ exports[`Renderer:text with options 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -1666,6 +2064,7 @@ exports[`Renderer:text with options 1`] = `
                 aria-autocomplete="list"
                 aria-labelledby="downshift-0-label"
                 autocomplete="off"
+                class=""
                 id="downshift-0-input"
                 name="text"
                 size="10"
@@ -1736,7 +2135,7 @@ exports[`Renderer:text with options 1`] = `
 </div>
 `;
 
-exports[`Renderer:text with options and multiple: first option selected 1`] = `
+exports[`Renderer:text with options and multiple and delimiter: first option selected 1`] = `
 <div>
   <div
     class="cxd-Panel cxd-Panel--default cxd-Panel--form"
@@ -1768,13 +2167,6 @@ exports[`Renderer:text with options and multiple: first option selected 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {
-  "text": "a"
-}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -1821,6 +2213,7 @@ exports[`Renderer:text with options and multiple: first option selected 1`] = `
                 aria-controls="downshift-1-menu"
                 aria-labelledby="downshift-1-label"
                 autocomplete="off"
+                class=""
                 id="downshift-1-input"
                 name="text"
                 size="10"
@@ -1861,6 +2254,24 @@ exports[`Renderer:text with options and multiple: first option selected 1`] = `
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <div
+            class="cxd-Form-static"
+          >
+            <div
+              class="cxd-Form-control"
+            >
+              <span
+                class="cxd-PlainField"
+              >
+                a
+              </span>
             </div>
           </div>
         </div>
@@ -1925,7 +2336,7 @@ exports[`Renderer:text with options and multiple: first option selected 1`] = `
 </div>
 `;
 
-exports[`Renderer:text with options and multiple: options is opened 1`] = `
+exports[`Renderer:text with options and multiple and delimiter: options is opened 1`] = `
 <div>
   <div
     class="cxd-Panel cxd-Panel--default cxd-Panel--form"
@@ -1957,11 +2368,6 @@ exports[`Renderer:text with options and multiple: options is opened 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -1995,6 +2401,7 @@ exports[`Renderer:text with options and multiple: options is opened 1`] = `
                 aria-controls="downshift-1-menu"
                 aria-labelledby="downshift-1-label"
                 autocomplete="off"
+                class=""
                 id="downshift-1-input"
                 name="text"
                 size="10"
@@ -2048,192 +2455,25 @@ exports[`Renderer:text with options and multiple: options is opened 1`] = `
             </div>
           </div>
         </div>
-      </form>
-    </div>
-    <div
-      class="cxd-Panel-footerWrap"
-    >
-      <div
-        class="cxd-Panel-btnToolbar cxd-Panel-footer"
-      >
-        <button
-          class="cxd-Button cxd-Button--primary"
-          type="submit"
-        >
-          <span>
-            提交
-          </span>
-        </button>
-      </div>
-    </div>
-    <div
-      class="resize-sensor"
-      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
-    >
-      
-  
-      <div
-        class="resize-sensor-expand"
-        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
-      >
-        
-    
-        <div
-          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
-        />
-        
-  
-      </div>
-      
-  
-      <div
-        class="resize-sensor-shrink"
-        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
-      >
-        
-    
-        <div
-          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
-        />
-        
-  
-      </div>
-      
-  
-      <div
-        class="resize-sensor-appear"
-        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
-      />
-    </div>
-  </div>
-</div>
-`;
-
-exports[`Renderer:text with options and multiple: options is opened again, and first option already selected 1`] = `
-<div>
-  <div
-    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
-    style="position: relative;"
-  >
-    <div
-      class="cxd-Panel-heading"
-    >
-      <h3
-        class="cxd-Panel-title"
-      >
-        <span
-          class="cxd-TplField"
-        >
-          <span>
-            表单
-          </span>
-        </span>
-      </h3>
-    </div>
-    <div
-      class="cxd-Panel-body"
-    >
-      <form
-        class="cxd-Form cxd-Form--normal"
-        novalidate=""
-      >
-        <input
-          style="display: none;"
-          type="submit"
-        />
-        <pre>
-          <code>
-            {
-  "text": "a"
-}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
         >
-          <label
-            class="cxd-Form-label"
-          >
-            <span>
-              <span
-                class="cxd-TplField"
-              >
-                <span>
-                  text
-                </span>
-              </span>
-            </span>
-          </label>
           <div
-            class="cxd-Form-control cxd-TextControl is-focused"
+            class="cxd-Form-static"
           >
             <div
-              aria-expanded="true"
-              aria-haspopup="listbox"
-              aria-labelledby="downshift-1-label"
-              aria-owns="downshift-1-menu"
-              class="cxd-TextControl-input cxd-TextControl-input--withAC is-opened cxd-TextControl-input--multiple"
-              role="combobox"
+              class="cxd-Form-control"
             >
-              <div
-                class="cxd-TextControl-value"
+              <span
+                class="cxd-PlainField"
               >
                 <span
-                  class="cxd-TextControl-valueLabel"
+                  class="text-muted"
                 >
-                  OptionA
+                  -
                 </span>
-                <icon-mock
-                  classname="cxd-TextControl-valueIcon icon icon-close"
-                  icon="close"
-                />
-              </div>
-              <input
-                aria-autocomplete="list"
-                aria-controls="downshift-1-menu"
-                aria-labelledby="downshift-1-label"
-                autocomplete="off"
-                id="downshift-1-input"
-                name="text"
-                size="10"
-                type="text"
-                value=""
-              />
-              <div
-                class="cxd-TextControl-sugs"
-              >
-                <div
-                  aria-selected="false"
-                  class="cxd-TextControl-sugItem"
-                  id="downshift-1-item-0"
-                  role="option"
-                >
-                  <span>
-                    OptionB
-                  </span>
-                </div>
-                <div
-                  aria-selected="false"
-                  class="cxd-TextControl-sugItem"
-                  id="downshift-1-item-1"
-                  role="option"
-                >
-                  <span>
-                    OptionC
-                  </span>
-                </div>
-                <div
-                  aria-selected="false"
-                  class="cxd-TextControl-sugItem"
-                  id="downshift-1-item-2"
-                  role="option"
-                >
-                  <span>
-                    OptionD
-                  </span>
-                </div>
-              </div>
+              </span>
             </div>
           </div>
         </div>
@@ -2298,7 +2538,7 @@ exports[`Renderer:text with options and multiple: options is opened again, and f
 </div>
 `;
 
-exports[`Renderer:text with options and multiple: second option selected 1`] = `
+exports[`Renderer:text with options and multiple and delimiter: options is opened again, and first option already selected 1`] = `
 <div>
   <div
     class="cxd-Panel cxd-Panel--default cxd-Panel--form"
@@ -2330,13 +2570,207 @@ exports[`Renderer:text with options and multiple: second option selected 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {
-  "text": "a,b"
-}
-          </code>
-        </pre>
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <label
+            class="cxd-Form-label"
+          >
+            <span>
+              <span
+                class="cxd-TplField"
+              >
+                <span>
+                  text
+                </span>
+              </span>
+            </span>
+          </label>
+          <div
+            class="cxd-Form-control cxd-TextControl is-focused"
+          >
+            <div
+              aria-expanded="true"
+              aria-haspopup="listbox"
+              aria-labelledby="downshift-1-label"
+              aria-owns="downshift-1-menu"
+              class="cxd-TextControl-input cxd-TextControl-input--withAC is-opened cxd-TextControl-input--multiple"
+              role="combobox"
+            >
+              <div
+                class="cxd-TextControl-value"
+              >
+                <span
+                  class="cxd-TextControl-valueLabel"
+                >
+                  OptionA
+                </span>
+                <icon-mock
+                  classname="cxd-TextControl-valueIcon icon icon-close"
+                  icon="close"
+                />
+              </div>
+              <input
+                aria-autocomplete="list"
+                aria-controls="downshift-1-menu"
+                aria-labelledby="downshift-1-label"
+                autocomplete="off"
+                class=""
+                id="downshift-1-input"
+                name="text"
+                size="10"
+                type="text"
+                value=""
+              />
+              <div
+                class="cxd-TextControl-sugs"
+              >
+                <div
+                  aria-selected="false"
+                  class="cxd-TextControl-sugItem"
+                  id="downshift-1-item-0"
+                  role="option"
+                >
+                  <span>
+                    OptionB
+                  </span>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="cxd-TextControl-sugItem"
+                  id="downshift-1-item-1"
+                  role="option"
+                >
+                  <span>
+                    OptionC
+                  </span>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="cxd-TextControl-sugItem"
+                  id="downshift-1-item-2"
+                  role="option"
+                >
+                  <span>
+                    OptionD
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <div
+            class="cxd-Form-static"
+          >
+            <div
+              class="cxd-Form-control"
+            >
+              <span
+                class="cxd-PlainField"
+              >
+                a
+              </span>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div
+      class="cxd-Panel-footerWrap"
+    >
+      <div
+        class="cxd-Panel-btnToolbar cxd-Panel-footer"
+      >
+        <button
+          class="cxd-Button cxd-Button--primary"
+          type="submit"
+        >
+          <span>
+            提交
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="resize-sensor"
+      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
+    >
+      
+  
+      <div
+        class="resize-sensor-expand"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-shrink"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-appear"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Renderer:text with options and multiple and delimiter: second option selected 1`] = `
+<div>
+  <div
+    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
+    style="position: relative;"
+  >
+    <div
+      class="cxd-Panel-heading"
+    >
+      <h3
+        class="cxd-Panel-title"
+      >
+        <span
+          class="cxd-TplField"
+        >
+          <span>
+            表单
+          </span>
+        </span>
+      </h3>
+    </div>
+    <div
+      class="cxd-Panel-body"
+    >
+      <form
+        class="cxd-Form cxd-Form--normal"
+        novalidate=""
+      >
+        <input
+          style="display: none;"
+          type="submit"
+        />
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -2396,6 +2830,7 @@ exports[`Renderer:text with options and multiple: second option selected 1`] = `
                 aria-controls="downshift-1-menu"
                 aria-labelledby="downshift-1-label"
                 autocomplete="off"
+                class=""
                 id="downshift-1-input"
                 name="text"
                 size="10"
@@ -2426,6 +2861,215 @@ exports[`Renderer:text with options and multiple: second option selected 1`] = `
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <div
+            class="cxd-Form-static"
+          >
+            <div
+              class="cxd-Form-control"
+            >
+              <span
+                class="cxd-PlainField"
+              >
+                a-b
+              </span>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div
+      class="cxd-Panel-footerWrap"
+    >
+      <div
+        class="cxd-Panel-btnToolbar cxd-Panel-footer"
+      >
+        <button
+          class="cxd-Button cxd-Button--primary"
+          type="submit"
+        >
+          <span>
+            提交
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="resize-sensor"
+      style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: scroll; z-index: -1; visibility: hidden;"
+    >
+      
+  
+      <div
+        class="resize-sensor-expand"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0px; top: 0px; width: 10px; height: 10px;"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-shrink"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;"
+      >
+        
+    
+        <div
+          style="position: absolute; left: 0; top: 0; width: 200%; height: 200%"
+        />
+        
+  
+      </div>
+      
+  
+      <div
+        class="resize-sensor-appear"
+        style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: scroll; z-index: -1; visibility: hidden;animation-name: apearSensor; animation-duration: 0.2s;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Renderer:text with options and multiple and delimiter: thrid option create 1`] = `
+<div>
+  <div
+    class="cxd-Panel cxd-Panel--default cxd-Panel--form"
+    style="position: relative;"
+  >
+    <div
+      class="cxd-Panel-heading"
+    >
+      <h3
+        class="cxd-Panel-title"
+      >
+        <span
+          class="cxd-TplField"
+        >
+          <span>
+            表单
+          </span>
+        </span>
+      </h3>
+    </div>
+    <div
+      class="cxd-Panel-body"
+    >
+      <form
+        class="cxd-Form cxd-Form--normal"
+        novalidate=""
+      >
+        <input
+          style="display: none;"
+          type="submit"
+        />
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <label
+            class="cxd-Form-label"
+          >
+            <span>
+              <span
+                class="cxd-TplField"
+              >
+                <span>
+                  text
+                </span>
+              </span>
+            </span>
+          </label>
+          <div
+            class="cxd-Form-control cxd-TextControl is-focused"
+          >
+            <div
+              aria-expanded="false"
+              aria-haspopup="listbox"
+              aria-labelledby="downshift-1-label"
+              class="cxd-TextControl-input cxd-TextControl-input--withAC cxd-TextControl-input--multiple"
+              role="combobox"
+            >
+              <div
+                class="cxd-TextControl-value"
+              >
+                <span
+                  class="cxd-TextControl-valueLabel"
+                >
+                  OptionA
+                </span>
+                <icon-mock
+                  classname="cxd-TextControl-valueIcon icon icon-close"
+                  icon="close"
+                />
+              </div>
+              <div
+                class="cxd-TextControl-value"
+              >
+                <span
+                  class="cxd-TextControl-valueLabel"
+                >
+                  OptionB
+                </span>
+                <icon-mock
+                  classname="cxd-TextControl-valueIcon icon icon-close"
+                  icon="close"
+                />
+              </div>
+              <div
+                class="cxd-TextControl-value"
+              >
+                <span
+                  class="cxd-TextControl-valueLabel"
+                >
+                  AbCd
+                </span>
+                <icon-mock
+                  classname="cxd-TextControl-valueIcon icon icon-close"
+                  icon="close"
+                />
+              </div>
+              <input
+                aria-autocomplete="list"
+                aria-labelledby="downshift-1-label"
+                autocomplete="off"
+                class=""
+                id="downshift-1-input"
+                name="text"
+                size="10"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="cxd-Form-item cxd-Form-item--normal"
+          data-role="form-item"
+        >
+          <div
+            class="cxd-Form-static"
+          >
+            <div
+              class="cxd-Form-control"
+            >
+              <span
+                class="cxd-PlainField"
+              >
+                a-b-AbCd
+              </span>
             </div>
           </div>
         </div>
@@ -2522,11 +3166,6 @@ exports[`Renderer:text with options: options is open 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -2560,6 +3199,7 @@ exports[`Renderer:text with options: options is open 1`] = `
                 aria-controls="downshift-0-menu"
                 aria-labelledby="downshift-0-label"
                 autocomplete="off"
+                class=""
                 id="downshift-0-input"
                 name="text"
                 size="10"
@@ -2686,13 +3326,6 @@ exports[`Renderer:text with options: select first option 1`] = `
           style="display: none;"
           type="submit"
         />
-        <pre>
-          <code>
-            {
-  "text": "a"
-}
-          </code>
-        </pre>
         <div
           class="cxd-Form-item cxd-Form-item--normal"
           data-role="form-item"
@@ -2726,6 +3359,7 @@ exports[`Renderer:text with options: select first option 1`] = `
                 aria-controls="downshift-0-menu"
                 aria-labelledby="downshift-0-label"
                 autocomplete="off"
+                class=""
                 id="downshift-0-input"
                 name="text"
                 size="10"

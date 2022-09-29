@@ -66,7 +66,9 @@ exports[`Renderer:dateRange 1`] = `
               <span
                 class="cxd-DateRangePicker-input-separator"
               >
-                -
+                <span
+                  class="cxd-DateRangePicker-input-separator-line"
+                />
               </span>
               <input
                 autocomplete="off"
@@ -74,6 +76,10 @@ exports[`Renderer:dateRange 1`] = `
                 placeholder="结束时间"
                 type="text"
                 value="2019-06-26"
+              />
+              <div
+                class="cxd-DateRangePicker-activeCursor"
+                style="position: absolute; left: 0px; width: 0px;"
               />
               <a
                 class="cxd-DateRangePicker-clear"

@@ -1,13 +1,13 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
-import {ScopedContext, IScopedContext} from 'amis-core';
+import {ScopedContext, IScopedContext, SchemaExpression} from 'amis-core';
 import {Renderer, RendererProps} from 'amis-core';
 import {SchemaNode, ActionObject, Schema} from 'amis-core';
 import forEach from 'lodash/forEach';
 import {evalExpression, filter} from 'amis-core';
-import {BadgeObject, Checkbox} from 'amis-ui';
+import {BadgeObject, Checkbox, Spinner} from 'amis-ui';
 import {Button} from 'amis-ui';
-import {TableStore, ITableStore} from 'amis-core';
+import {TableStore, ITableStore, padArr} from 'amis-core';
 import {
   anyChanged,
   getScrollParent,
@@ -165,10 +165,19 @@ export type TableColumnObject = {
    * 是否唯一, 只有在 inputTable 里面才有用
    */
   unique?: boolean;
+
+  /**
+   * 表格列单元格是否可以获取父级数据域值，默认为true，该配置对当前列内单元格生效
+   */
+  canAccessSuperData?: boolean;
 };
 
 export type TableColumnWithType = SchemaObject & TableColumnObject;
 export type TableColumn = TableColumnWithType | TableColumnObject;
+
+interface AutoFillHeightObject {
+  height: number;
+}
 
 /**
  * Table 表格渲染器。
@@ -257,7 +266,7 @@ export interface TableSchema extends BaseSchema {
   /**
    * 合并单元格配置，配置数字表示从左到右的多少列自动合并单元格。
    */
-  combineNum?: number;
+  combineNum?: number | SchemaExpression;
 
   /**
    * 合并单元格配置，配置从第几列开始合并。
@@ -293,6 +302,16 @@ export interface TableSchema extends BaseSchema {
    * 开启查询区域，会根据列元素的searchable属性值，自动生成查询条件表单
    */
   autoGenerateFilter?: boolean;
+
+  /**
+   * 表格是否可以获取父级数据域值，默认为false
+   */
+  canAccessSuperData?: boolean;
+
+  /**
+   * 表格自动计算高度
+   */
+  autoFillHeight?: boolean | AutoFillHeightObject;
 }
 
 export interface TableProps extends RendererProps {
@@ -319,7 +338,7 @@ export interface TableProps extends RendererProps {
   columnsTogglable?: boolean | 'auto';
   affixHeader?: boolean;
   affixColumns?: boolean;
-  combineNum?: number | string;
+  combineNum?: number | SchemaExpression;
   combineFromIndex?: number;
   footable?:
     | boolean
@@ -347,7 +366,10 @@ export interface TableProps extends RendererProps {
     rowIndexes: Array<string> | string,
     unModifiedItems?: Array<object>,
     rowOrigins?: Array<object> | object,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) => void;
   onSaveOrder?: (moved: Array<object>, items: Array<object>) => void;
   onQuery: (values: object) => void;
@@ -362,6 +384,7 @@ export interface TableProps extends RendererProps {
   reUseRow?: boolean;
   itemBadge?: BadgeObject;
   loading?: boolean;
+  autoFillHeight?: boolean | AutoFillHeightObject;
 }
 
 export type ExportExcelToolbar = SchemaNode & {
@@ -463,6 +486,7 @@ export default class Table extends React.Component<TableProps, object> {
   affixedTable?: HTMLTableElement;
   parentNode?: HTMLElement | Window;
   lastScrollLeft: number = -1;
+  lastScrollTop: number = 0;
   totalWidth: number = 0;
   totalHeight: number = 0;
   outterWidth: number = 0;
@@ -605,9 +629,8 @@ export default class Table extends React.Component<TableProps, object> {
   }
 
   componentDidMount() {
-    let parent: HTMLElement | Window | null = getScrollParent(
-      findDOMNode(this) as HTMLElement
-    );
+    const currentNode = findDOMNode(this) as HTMLElement;
+    let parent: HTMLElement | Window | null = getScrollParent(currentNode);
 
     if (!parent || parent === document.body) {
       parent = window;
@@ -660,6 +683,13 @@ export default class Table extends React.Component<TableProps, object> {
     const footToolbar = table.querySelector(
       `.${ns}Table-footToolbar`
     ) as HTMLElement;
+    const leftFixedColumns = table.querySelector(
+      `.${ns}Table-fixedLeft`
+    ) as HTMLElement;
+    const rightFixedColumns = table.querySelector(
+      `.${ns}Table-fixedRight`
+    ) as HTMLElement;
+
     if (!tableContent) {
       return;
     }
@@ -692,13 +722,30 @@ export default class Table extends React.Component<TableProps, object> {
       parentNode = parentNode.parentElement;
     }
 
-    tableContent.style.height = `${
-      viewportHeight -
-      tableContentTop -
-      tableContentWrapMarginButtom -
-      footToolbarHeight -
-      allParentPaddingButtom
-    }px`;
+    const height = isObject(autoFillHeight)
+      ? (autoFillHeight as AutoFillHeightObject).height
+      : 0;
+
+    const tableContentHeight = height
+      ? `${height}px`
+      : `${
+          viewportHeight -
+          tableContentTop -
+          tableContentWrapMarginButtom -
+          footToolbarHeight -
+          allParentPaddingButtom
+        }px`;
+
+    tableContent.style.height = tableContentHeight;
+    /**autoFillHeight开启后固定列会溢出Table高度，需要同步一下 */
+    if (leftFixedColumns) {
+      leftFixedColumns.style.height = tableContentHeight;
+      leftFixedColumns.style.overflowY = 'auto';
+    }
+    if (rightFixedColumns) {
+      rightFixedColumns.style.height = tableContentHeight;
+      rightFixedColumns.style.overflowY = 'auto';
+    }
   }
 
   componentDidUpdate(prevProps: TableProps) {
@@ -803,7 +850,11 @@ export default class Table extends React.Component<TableProps, object> {
     form && this.props.store.addForm(form.props.store, y);
   }
 
-  handleAction(e: React.UIEvent<any>, action: ActionObject, ctx: object) {
+  handleAction(
+    e: React.UIEvent<any> | undefined,
+    action: ActionObject,
+    ctx: object
+  ) {
     const {onAction} = this.props;
 
     // todo
@@ -867,7 +918,10 @@ export default class Table extends React.Component<TableProps, object> {
     values: object,
     saveImmediately?: boolean | any,
     savePristine?: boolean,
-    resetOnFailed?: boolean
+    options?: {
+      resetOnFailed?: boolean;
+      reload?: string;
+    }
   ) {
     if (!isAlive(item)) {
       return;
@@ -897,7 +951,8 @@ export default class Table extends React.Component<TableProps, object> {
         null,
         {
           actionType: 'ajax',
-          api: saveImmediately.api
+          api: saveImmediately.api,
+          reload: options?.reload
         },
         values
       );
@@ -914,7 +969,7 @@ export default class Table extends React.Component<TableProps, object> {
       item.path,
       undefined,
       item.pristine,
-      resetOnFailed
+      options
     );
   }
 
@@ -1041,10 +1096,19 @@ export default class Table extends React.Component<TableProps, object> {
       clip.top - headerHeight - headingHeight < offsetY &&
       clip.top + clip.height - 40 > offsetY;
     const affixedDom = dom.querySelector(`.${ns}Table-fixedTop`) as HTMLElement;
+    const affixedShadowDom = dom.querySelector(
+      `.${ns}Table-fixedTop-shadow`
+    ) as HTMLElement;
+    const affixedDomHeight =
+      getComputedStyle(affixedDom).getPropertyValue('height');
 
     affixedDom.style.cssText += `top: ${offsetY}px;width: ${
       (this.table.parentNode as HTMLElement).offsetWidth
     }px`;
+    affixedShadowDom.style.cssText += `top: ${affixedDomHeight};width: ${
+      (this.table.parentNode as HTMLElement).offsetWidth
+    }px`;
+
     affixed
       ? affixedDom.classList.add('in')
       : affixedDom.classList.remove('in');
@@ -1078,7 +1142,7 @@ export default class Table extends React.Component<TableProps, object> {
       [propName: string]: number;
     } = (this.widths2 = {});
     let heights: {
-      [propName: string]: number;
+      [propName: string]: number | string;
     } = (this.heights = {});
 
     heights.header = table
@@ -1106,8 +1170,13 @@ export default class Table extends React.Component<TableProps, object> {
 
     forEach(
       table.querySelectorAll('tbody>tr>*:last-child'),
+      /**
+       * ! 弹窗中的特殊说明
+       * ! 在弹窗中，modal 有一个 scale 的动画，导致 getBoundingClientRect 获取的高度不准确
+       * ! width 准确是因为 table-layout: auto 导致
+       */
       (item: HTMLElement, index: number) =>
-        (heights[index] = item.getBoundingClientRect().height)
+        (heights[index] = getComputedStyle(item).height)
     );
 
     // 让 react 去更新非常慢，还是手动更新吧。
@@ -1146,7 +1215,7 @@ export default class Table extends React.Component<TableProps, object> {
         forEach(
           table.querySelectorAll('tbody>tr'),
           (item: HTMLElement, index) => {
-            item.style.cssText += `height: ${heights[index]}px`;
+            item.style.cssText += `height: ${heights[index]}`;
           }
         );
 
@@ -1172,39 +1241,66 @@ export default class Table extends React.Component<TableProps, object> {
   handleOutterScroll() {
     const outter = (this.table as HTMLElement).parentNode as HTMLElement;
     const scrollLeft = outter.scrollLeft;
-
-    if (scrollLeft === this.lastScrollLeft) {
-      return;
-    }
-
-    this.lastScrollLeft = scrollLeft;
-    let leading = scrollLeft === 0;
-    let trailing = Math.ceil(scrollLeft) + this.outterWidth >= this.totalWidth;
-    // console.log(scrollLeft, store.outterWidth, store.totalWidth, (scrollLeft + store.outterWidth) === store.totalWidth);
-    // store.setLeading(leading);
-    // store.setTrailing(trailing);
-
     const ns = this.props.classPrefix;
     const dom = findDOMNode(this) as HTMLElement;
-
     const fixedLeft = dom.querySelectorAll(`.${ns}Table-fixedLeft`);
-    if (fixedLeft && fixedLeft.length) {
-      for (let i = 0, len = fixedLeft.length; i < len; i++) {
-        let node = fixedLeft[i];
-        leading ? node.classList.remove('in') : node.classList.add('in');
+    const fixedRight = dom.querySelectorAll(`.${ns}Table-fixedRight`);
+
+    if (scrollLeft !== this.lastScrollLeft) {
+      this.lastScrollLeft = scrollLeft;
+      let leading = scrollLeft === 0;
+      let trailing =
+        Math.ceil(scrollLeft) + this.outterWidth >= this.totalWidth;
+      // console.log(scrollLeft, store.outterWidth, store.totalWidth, (scrollLeft + store.outterWidth) === store.totalWidth);
+      // store.setLeading(leading);
+      // store.setTrailing(trailing);
+
+      if (fixedLeft && fixedLeft.length) {
+        for (let i = 0, len = fixedLeft.length; i < len; i++) {
+          let node = fixedLeft[i];
+          leading ? node.classList.remove('in') : node.classList.add('in');
+        }
+      }
+
+      if (fixedRight && fixedRight.length) {
+        for (let i = 0, len = fixedRight.length; i < len; i++) {
+          let node = fixedRight[i];
+          trailing ? node.classList.remove('in') : node.classList.add('in');
+        }
+      }
+      const table = this.affixedTable;
+      if (table) {
+        table.style.cssText += `transform: translateX(-${scrollLeft}px)`;
       }
     }
 
-    const fixedRight = dom.querySelectorAll(`.${ns}Table-fixedRight`);
-    if (fixedRight && fixedRight.length) {
-      for (let i = 0, len = fixedRight.length; i < len; i++) {
-        let node = fixedRight[i];
-        trailing ? node.classList.remove('in') : node.classList.add('in');
+    /* 同步固定列内容的垂直滚动 */
+    if (outter.scrollTop !== this.lastScrollTop) {
+      this.lastScrollTop = outter.scrollTop;
+
+      if (fixedLeft && fixedLeft.length) {
+        forEach(fixedLeft, node => node.scrollTo({top: outter.scrollTop}));
+      }
+
+      if (fixedRight && fixedRight.length) {
+        forEach(fixedRight, node => node.scrollTo({top: outter.scrollTop}));
       }
     }
-    const table = this.affixedTable;
-    if (table) {
-      table.style.cssText += `transform: translateX(-${scrollLeft}px)`;
+  }
+
+  @autobind
+  handleFixedColumnsScroll(event: React.UIEvent<any>) {
+    /** table内容区当前Top */
+    const currentScrollTop = this.lastScrollTop;
+    /** 固定列的新Top */
+    const fixedScrollTop = event.currentTarget.scrollTop;
+
+    if (currentScrollTop !== fixedScrollTop) {
+      this.lastScrollTop = fixedScrollTop;
+      const tableContentDom = (this.table as HTMLElement)
+        .parentNode as HTMLElement;
+
+      tableContentDom.scrollTo({top: fixedScrollTop});
     }
   }
 
@@ -1499,7 +1595,8 @@ export default class Table extends React.Component<TableProps, object> {
   @autobind
   handleColResizeMouseMove(e: MouseEvent) {
     const moveX = e.clientX - this.lineStartX;
-    this.resizeLine.style.left = this.resizeLineLeft + moveX + 'px';
+    // 光标right为-4px，列宽改变时会自动跟随，不需要单独处理位置
+    // this.resizeLine.style.left = this.resizeLineLeft + moveX + 'px';
     this.targetTh.style.width = this.targetThWidth + moveX + 'px';
   }
 
@@ -1533,30 +1630,48 @@ export default class Table extends React.Component<TableProps, object> {
       return null;
     }
 
-    const groupedSearchableColumns: Array<Record<string, any>> = [
-      {body: [], md: 4},
-      {body: [], md: 4},
-      {body: [], md: 4}
-    ];
+    const body: Array<any> = [];
 
-    activedSearchableColumns.forEach((column, index) => {
-      groupedSearchableColumns[index % 3].body.push({
-        ...(column.searchable === true
-          ? {
-              type: 'input-text',
-              name: column.name,
-              label: column.label
-            }
-          : {
-              type: 'input-text',
-              name: column.name,
-              ...column.searchable
-            }),
-        name: column.searchable?.name ?? column.name,
-        label: column.searchable?.label ?? column.label,
-        mode: 'horizontal'
+    padArr(activedSearchableColumns, 3, true).forEach(group => {
+      const children: Array<any> = [];
+
+      group.forEach(column => {
+        children.push(
+          column
+            ? {
+                ...(column.searchable === true
+                  ? {
+                      type: 'input-text',
+                      name: column.name,
+                      label: column.label
+                    }
+                  : {
+                      type: 'input-text',
+                      name: column.name,
+                      ...column.searchable
+                    }),
+                name: column.searchable?.name ?? column.name,
+                label: column.searchable?.label ?? column.label
+              }
+            : {
+                type: 'tpl',
+                tpl: ''
+              }
+        );
+      });
+
+      body.push({
+        type: 'group',
+        body: children
       });
     });
+
+    let showExpander = body.length > 1;
+
+    // todo 以后做动画
+    if (!store.searchFormExpanded) {
+      body.splice(1, body.length - 1);
+    }
 
     return render(
       'searchable-form',
@@ -1564,14 +1679,9 @@ export default class Table extends React.Component<TableProps, object> {
         type: 'form',
         api: null,
         title: '',
-        mode: 'normal',
+        mode: 'horizontal',
         submitText: __('search'),
-        body: [
-          {
-            type: 'grid',
-            columns: groupedSearchableColumns
-          }
-        ],
+        body: body,
         actions: [
           {
             type: 'dropdown-button',
@@ -1585,6 +1695,7 @@ export default class Table extends React.Component<TableProps, object> {
               return {
                 type: 'checkbox',
                 className: cx('Table-searchableForm-checkbox'),
+                inputClassName: cx('Table-searchableForm-checkbox-inner'),
                 name: `__search_${column.searchable?.name ?? column.name}`,
                 option: column.searchable?.label ?? column.label,
                 value: column.enableSearch,
@@ -1596,6 +1707,7 @@ export default class Table extends React.Component<TableProps, object> {
                 },
                 onChange: (value: boolean) => {
                   column.setEnableSearch(value);
+                  store.setSearchFormExpanded(true);
                 }
               };
             })
@@ -1610,8 +1722,27 @@ export default class Table extends React.Component<TableProps, object> {
             type: 'reset',
             label: __('reset'),
             className: 'w-18'
-          }
-        ]
+          },
+
+          showExpander
+            ? {
+                children: () => (
+                  <a
+                    className={cx(
+                      'Table-SFToggler',
+                      store.searchFormExpanded ? 'is-expanded' : ''
+                    )}
+                    onClick={store.toggleSearchFormExpanded}
+                  >
+                    {__(store.searchFormExpanded ? 'collapse' : 'expand')}
+                    <span className={cx('Table-SFToggler-arrow')}>
+                      <Icon icon="right-arrow-bold" className="icon" />
+                    </span>
+                  </a>
+                )
+              }
+            : null
+        ].filter(item => item)
       },
       {
         key: 'searchable-form',
@@ -1762,16 +1893,16 @@ export default class Table extends React.Component<TableProps, object> {
       );
     }
 
-    let affix = null;
+    let affix = [];
 
     if (column.searchable && column.name && !autoGenerateFilter) {
-      affix = (
+      affix.push(
         <HeadCellSearchDropDown
           {...this.props}
           onQuery={onQuery}
           name={column.name}
           searchable={column.searchable}
-          sortable={column.sortable}
+          sortable={false}
           type={column.type}
           data={query}
           orderBy={store.orderBy}
@@ -1779,8 +1910,9 @@ export default class Table extends React.Component<TableProps, object> {
           popOverContainer={this.getPopOverContainer}
         />
       );
-    } else if (column.sortable && column.name) {
-      affix = (
+    }
+    if (column.sortable && column.name) {
+      affix.push(
         <span
           className={cx('TableCell-sortBtn')}
           onClick={async () => {
@@ -1848,8 +1980,9 @@ export default class Table extends React.Component<TableProps, object> {
           </i>
         </span>
       );
-    } else if (column.filterable && column.name) {
-      affix = (
+    }
+    if (!column.searchable && column.filterable && column.name) {
+      affix.push(
         <HeadCellFilterDropDown
           {...this.props}
           onQuery={onQuery}
@@ -1896,6 +2029,7 @@ export default class Table extends React.Component<TableProps, object> {
             column.pristine.className,
             column.pristine.labelClassName
           )}
+          style={props.style}
         >
           {column.label ? render('tpl', column.label) : null}
 
@@ -1947,7 +2081,7 @@ export default class Table extends React.Component<TableProps, object> {
             classPrefix={ns}
             type={multiple ? 'checkbox' : 'radio'}
             checked={item.checked}
-            disabled={item.checkdisable}
+            disabled={item.checkdisable || !item.checkable}
             onChange={
               checkOnItemClick ? noop : this.handleCheck.bind(this, item)
             }
@@ -2013,6 +2147,8 @@ export default class Table extends React.Component<TableProps, object> {
 
     const subProps: any = {
       ...props,
+      // 操作列不下发loading，否则会导致操作栏里面的所有按钮都出现loading
+      loading: column.type === 'operation' ? false : props.loading,
       btnDisabled: store.dragging,
       data: item.locals,
       value: column.name
@@ -2053,70 +2189,73 @@ export default class Table extends React.Component<TableProps, object> {
     const columnsGroup = store.columnGroup;
 
     return affixHeader ? (
-      <div
-        className={cx('Table-fixedTop', {
-          'is-fakeHide': hideHeader
-        })}
-      >
-        {this.renderHeader(false)}
-        {this.renderHeading()}
-        <div className={cx('Table-fixedLeft')}>
-          {store.leftFixedColumns.length
-            ? this.renderFixedColumns(
-                store.rows,
-                store.leftFixedColumns,
-                true,
-                tableClassName
-              )
-            : null}
-        </div>
-        <div className={cx('Table-fixedRight')}>
-          {store.rightFixedColumns.length
-            ? this.renderFixedColumns(
-                store.rows,
-                store.rightFixedColumns,
-                true,
-                tableClassName
-              )
-            : null}
-        </div>
-        <div className={cx('Table-wrapper')}>
-          <table ref={this.affixedTableRef} className={tableClassName}>
-            <colgroup>
-              {store.filteredColumns.map(column => (
-                <col key={column.index} data-index={column.index} />
-              ))}
-            </colgroup>
-            <thead>
-              {columnsGroup.length ? (
+      <>
+        <div
+          className={cx('Table-fixedTop', {
+            'is-fakeHide': hideHeader
+          })}
+        >
+          {this.renderHeader(false)}
+          {this.renderHeading()}
+          <div className={cx('Table-fixedLeft')}>
+            {store.leftFixedColumns.length
+              ? this.renderFixedColumns(
+                  store.rows,
+                  store.leftFixedColumns,
+                  true,
+                  tableClassName
+                )
+              : null}
+          </div>
+          <div className={cx('Table-fixedRight')}>
+            {store.rightFixedColumns.length
+              ? this.renderFixedColumns(
+                  store.rows,
+                  store.rightFixedColumns,
+                  true,
+                  tableClassName
+                )
+              : null}
+          </div>
+          <div className={cx('Table-wrapper')}>
+            <table ref={this.affixedTableRef} className={tableClassName}>
+              <colgroup>
+                {store.filteredColumns.map(column => (
+                  <col key={column.index} data-index={column.index} />
+                ))}
+              </colgroup>
+              <thead>
+                {columnsGroup.length ? (
+                  <tr>
+                    {columnsGroup.map((item, index) => (
+                      <th
+                        key={index}
+                        data-index={item.index}
+                        colSpan={item.colSpan}
+                        rowSpan={item.rowSpan}
+                      >
+                        {item.label ? render('tpl', item.label) : null}
+                      </th>
+                    ))}
+                  </tr>
+                ) : null}
                 <tr>
-                  {columnsGroup.map((item, index) => (
-                    <th
-                      key={index}
-                      data-index={item.index}
-                      colSpan={item.colSpan}
-                      rowSpan={item.rowSpan}
-                    >
-                      {item.label ? render('tpl', item.label) : null}
-                    </th>
-                  ))}
+                  {store.filteredColumns.map(column =>
+                    columnsGroup.find(group => ~group.has.indexOf(column))
+                      ?.rowSpan === 2
+                      ? null
+                      : this.renderHeadCell(column, {
+                          'key': column.index,
+                          'data-index': column.index
+                        })
+                  )}
                 </tr>
-              ) : null}
-              <tr>
-                {store.filteredColumns.map(column =>
-                  columnsGroup.find(group => ~group.has.indexOf(column))
-                    ?.rowSpan === 2
-                    ? null
-                    : this.renderHeadCell(column, {
-                        'key': column.index,
-                        'data-index': column.index
-                      })
-                )}
-              </tr>
-            </thead>
-          </table>
+              </thead>
+            </table>
+          </div>
         </div>
-      </div>
+        <div className={cx('Table-fixedTop-shadow')}></div>
+      </>
     ) : null;
   }
 
@@ -2146,11 +2285,9 @@ export default class Table extends React.Component<TableProps, object> {
     const columnsGroup = store.columnGroup;
     return (
       <table
-        className={cx(
-          'Table-table',
-          store.combineNum > 0 ? 'Table-table--withCombine' : '',
-          tableClassName
-        )}
+        className={cx('Table-table', tableClassName, {
+          'Table-table--withCombine': store.combineNum > 0
+        })}
       >
         <thead>
           {columnsGroup.length ? (
@@ -2197,10 +2334,9 @@ export default class Table extends React.Component<TableProps, object> {
           </tbody>
         ) : (
           <TableBody
-            tableClassName={cx(
-              store.combineNum > 0 ? 'Table-table--withCombine' : '',
-              tableClassName
-            )}
+            tableClassName={cx(tableClassName, {
+              'Table-table--withCombine': store.combineNum > 0
+            })}
             itemAction={itemAction}
             classnames={cx}
             render={render}
@@ -2639,7 +2775,7 @@ export default class Table extends React.Component<TableProps, object> {
       itemActions,
       dispatchEvent,
       onEvent,
-      loading
+      loading = false
     } = this.props;
 
     // 理论上来说 store.rows 应该也行啊
@@ -2647,47 +2783,53 @@ export default class Table extends React.Component<TableProps, object> {
     store.rows.length;
 
     return (
-      <TableContent
-        tableClassName={cx(
-          store.combineNum > 0 ? 'Table-table--withCombine' : '',
-          {'Table-table--checkOnItemClick': checkOnItemClick},
-          tableClassName
-        )}
-        className={tableContentClassName}
-        itemActions={itemActions}
-        itemAction={itemAction}
-        store={store}
-        classnames={cx}
-        columns={store.filteredColumns}
-        columnsGroup={store.columnGroup}
-        rows={store.rows}
-        placeholder={placeholder}
-        render={render}
-        onMouseMove={this.handleMouseMove}
-        onScroll={this.handleOutterScroll}
-        tableRef={this.tableRef}
-        renderHeadCell={this.renderHeadCell}
-        renderCell={this.renderCell}
-        onCheck={this.handleCheck}
-        onQuickChange={store.dragging ? undefined : this.handleQuickChange}
-        footable={store.footable}
-        footableColumns={store.footableColumns}
-        checkOnItemClick={checkOnItemClick}
-        buildItemProps={buildItemProps}
-        onAction={this.handleAction}
-        rowClassNameExpr={rowClassNameExpr}
-        rowClassName={rowClassName}
-        data={store.data}
-        prefixRow={prefixRow}
-        affixRow={affixRow}
-        prefixRowClassName={prefixRowClassName}
-        affixRowClassName={affixRowClassName}
-        locale={locale}
-        translate={translate}
-        dispatchEvent={dispatchEvent}
-        onEvent={onEvent}
-        loading={loading}
-      />
+      <>
+        <TableContent
+          tableClassName={cx(
+            {
+              'Table-table--checkOnItemClick': checkOnItemClick,
+              'Table-table--withCombine': store.combineNum > 0
+            },
+            tableClassName
+          )}
+          className={tableContentClassName}
+          itemActions={itemActions}
+          itemAction={itemAction}
+          store={store}
+          classnames={cx}
+          columns={store.filteredColumns}
+          columnsGroup={store.columnGroup}
+          rows={store.rows}
+          placeholder={placeholder}
+          render={render}
+          onMouseMove={this.handleMouseMove}
+          onScroll={this.handleOutterScroll}
+          tableRef={this.tableRef}
+          renderHeadCell={this.renderHeadCell}
+          renderCell={this.renderCell}
+          onCheck={this.handleCheck}
+          onQuickChange={store.dragging ? undefined : this.handleQuickChange}
+          footable={store.footable}
+          footableColumns={store.footableColumns}
+          checkOnItemClick={checkOnItemClick}
+          buildItemProps={buildItemProps}
+          onAction={this.handleAction}
+          rowClassNameExpr={rowClassNameExpr}
+          rowClassName={rowClassName}
+          data={store.data}
+          prefixRow={prefixRow}
+          affixRow={affixRow}
+          prefixRowClassName={prefixRowClassName}
+          affixRowClassName={affixRowClassName}
+          locale={locale}
+          translate={translate}
+          dispatchEvent={dispatchEvent}
+          onEvent={onEvent}
+          loading={loading}
+        />
+
+        <Spinner overlay show={loading} />
+      </>
     );
   }
 
@@ -2720,6 +2862,7 @@ export default class Table extends React.Component<TableProps, object> {
         store.toggleDragging();
         break;
       default:
+        this.handleAction(undefined, action, data);
         break;
     }
   }
@@ -2738,11 +2881,9 @@ export default class Table extends React.Component<TableProps, object> {
     const heading = this.renderHeading();
     const header = this.renderHeader();
     const footer = this.renderFooter();
-    const tableClassName = cx(
-      'Table-table',
-      store.combineNum > 0 ? 'Table-table--withCombine' : '',
-      this.props.tableClassName
-    );
+    const tableClassName = cx('Table-table', this.props.tableClassName, {
+      'Table-table--withCombine': store.combineNum > 0
+    });
 
     return (
       <div
@@ -2759,8 +2900,11 @@ export default class Table extends React.Component<TableProps, object> {
           onMouseLeave={this.handleMouseLeave}
         >
           <div
-            className={cx('Table-fixedLeft')}
+            className={cx('Table-fixedLeft', {
+              'Table-fixedLeft--autoFillHeight': autoFillHeight
+            })}
             onMouseMove={this.handleMouseMove}
+            onScroll={this.handleFixedColumnsScroll}
           >
             {affixColumns !== false && store.leftFixedColumns.length
               ? this.renderFixedColumns(
@@ -2772,8 +2916,11 @@ export default class Table extends React.Component<TableProps, object> {
               : null}
           </div>
           <div
-            className={cx('Table-fixedRight')}
+            className={cx('Table-fixedRight', {
+              'Table-fixedLeft--autoFillHeight': autoFillHeight
+            })}
             onMouseMove={this.handleMouseMove}
+            onScroll={this.handleFixedColumnsScroll}
           >
             {affixColumns !== false && store.rightFixedColumns.length
               ? this.renderFixedColumns(

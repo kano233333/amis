@@ -15,7 +15,7 @@
 <div align="center">
   QQ 群: 1147750223（已满） |
   QQ 群2: 651547026 |
-  如流群：3395342（已满）|
+  如流群：3395342 |
   如流群2：5511067|
 </div>
 
@@ -38,7 +38,7 @@
 
 > 如果 github 下载慢可以使用 [gitee](https://gitee.com/baidu/amis) 上的镜像。
 
-推荐使用 node 12/14。
+推荐使用 node 12/14/16。npm 7+， 因为用到了 workspaces 功能。
 
 ```bash
 # 安装项目 npm 依赖，在 node 12 下会有报错但不影响正常使用。
@@ -57,6 +57,9 @@ npm start
 # 安装依赖
 npm i --legacy-peer-deps
 
+# 执行构建
+npm run build
+
 # 执行测试用例
 npm test --workspaces
 
@@ -72,6 +75,9 @@ npm run update-snapshot
 ```bash
 # 先通过一下命令设置版本号
 npm run version
+
+# 如果是 beta 版本使用如下命令
+# npm run version -- 2.0.1-beta.0 --no-git-tag-version
 
 # 发布内部 registry
 npm run publish-to-internal

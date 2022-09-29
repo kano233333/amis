@@ -1,7 +1,7 @@
 import React from 'react';
 import {autobind, isMobile} from 'amis-core';
-import Overlay from './Overlay';
-import PopOver from './PopOver';
+import {Overlay} from 'amis-core';
+import {PopOver} from 'amis-core';
 import PopUp from './PopUp';
 import {findDOMNode} from 'react-dom';
 
@@ -15,6 +15,7 @@ export interface PopOverContainerProps {
   popOverContainer?: any;
   popOverClassName?: string;
   useMobileUI?: boolean;
+  placement?: string;
 }
 
 export interface PopOverContainerState {
@@ -66,7 +67,8 @@ export class PopOverContainer extends React.Component<
       children,
       popOverContainer,
       popOverClassName,
-      popOverRender: dropdownRender
+      popOverRender: dropdownRender,
+      placement
     } = this.props;
     const mobileUI = useMobileUI && isMobile();
     return (
@@ -89,7 +91,7 @@ export class PopOverContainer extends React.Component<
           <Overlay
             container={popOverContainer || this.getParent}
             target={this.getTarget}
-            placement={'auto'}
+            placement={placement || 'auto'}
             show={this.state.isOpened}
           >
             <PopOver

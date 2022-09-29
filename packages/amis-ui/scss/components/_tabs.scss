@@ -144,9 +144,17 @@
         outline: none;
       }
 
+      &:hover .#{$ns}Tabs-link-close {
+        width: var(--Tabs-close-size);
+        margin-left: var(--Tabs-close-margin);
+      }
+
       .#{$ns}Tabs-link-close {
-        margin: var(--Tabs-close-marginTop) 0 0 var(--Tabs-close-margin);
+        width: 0;
+        margin: var(--Tabs-close-marginTop) 0 0;
         fill: var(--Tabs-gray-color);
+        transition: all var(--Tabs-animation-duration) linear;
+        overflow: hidden;
         cursor: pointer;
 
         .#{$ns}Tabs-link-close-icon {
@@ -170,6 +178,20 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+
+        > .#{$ns}Icon {
+          margin-right: var(--Tabs-icon-gap);
+          vertical-align: unset;
+        }
+
+        > img.#{$ns}Icon {
+          position: relative;
+          top: 0.125em;
+        }
+      }
+
+      > a.#{$ns}Tabs-togglor {
+        display: flex;
       }
 
       > .#{$ns}Combo-toolbarBtn {
@@ -212,6 +234,45 @@
     }
   }
 
+  .#{$ns}Tabs-togglor {
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    cursor: pointer;
+
+    &-arrow {
+      width: var(--gap-md);
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      transform: rotate(90deg);
+
+      > svg {
+        transition: transform var(--animation-duration);
+        display: inline-block;
+        color: var(--Form-select-caret-iconColor);
+        width: 10px;
+        height: 10px;
+        top: 0;
+      }
+    }
+
+    &.is-opened {
+      color: var(--Tabs-onActive-color);
+
+      .#{$ns}Tabs-togglor-arrow > svg {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  &-PopOver.#{$ns}PopOver {
+    border: 0;
+    border-radius: 0;
+  }
+
   &-content {
     background: var(--Tabs-content-bg);
     border-style: solid;
@@ -236,8 +297,17 @@
 
   &--line {
     > .#{$ns}Tabs-linksContainer-wrapper {
-      border-bottom: var(--Tabs-borderWidth) solid
-        var(--Tabs--simple-split-color);
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        border-bottom: var(--Tabs-borderWidth) solid
+          var(--Tabs--simple-split-color);
+      }
 
       &--toolbar {
         .#{$ns}Tabs-link {
@@ -291,6 +361,11 @@
 
           .#{$ns}Tabs-link-close {
             fill: var(--primary);
+          }
+
+          > a:first-child:hover:active {
+            color: #144bcc;
+            border-color: #144bcc;
           }
         }
 
@@ -676,6 +751,8 @@
             font-size: var(--Tabs--sidebar-iconSize);
             height: var(--Tabs--sidebar-iconSize);
             margin-bottom: var(--Tabs--sidebar-iconMargin);
+            margin-right: 0;
+            top: 0;
           }
         }
         &.is-active > a:first-child,
@@ -754,7 +831,7 @@
           }
         }
 
-        &:after {
+        &:not(:last-child):after {
           content: '';
           width: 1px;
           height: calc(100% - var(--Tabs--chrome-radius-size) * 2);
@@ -852,7 +929,6 @@
             }
 
             & > .#{$ns}Tabs-link-close {
-              padding-top: var(--Tabs--simple-split-width);
               cursor: pointer;
             }
 
@@ -867,6 +943,11 @@
               > a:first-child:focus {
                 color: var(--Tabs--line-onHover-color);
                 border: none;
+              }
+
+              > a:first-child:hover:active {
+                color: #144bcc;
+                border-color: #144bcc;
               }
             }
 
@@ -986,6 +1067,11 @@
             > a:first-child:hover,
             > a:first-child:focus {
               color: var(--Tabs--line-onHover-color);
+            }
+
+            > a:first-child:hover:active {
+              color: #144bcc;
+              border-color: #144bcc;
             }
           }
 

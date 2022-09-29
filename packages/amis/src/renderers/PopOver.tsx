@@ -8,8 +8,8 @@ import {findDOMNode} from 'react-dom';
 import {RendererProps} from 'amis-core';
 import cx from 'classnames';
 import hoistNonReactStatic from 'hoist-non-react-statics';
-import {PopOver} from 'amis-ui';
-import {Overlay} from 'amis-ui';
+import {PopOver} from 'amis-core';
+import {Overlay} from 'amis-core';
 import {Icon} from 'amis-ui';
 import {SchemaCollection, SchemaExpression} from '../Schema';
 import {RootClose} from 'amis-core';
@@ -239,6 +239,19 @@ export const HocPopOver =
         return schema || 'error';
       }
 
+      getOffset() {
+        const {popOver} = this.props;
+        if (typeof popOver === 'boolean' || !popOver.offset) {
+          return undefined;
+        }
+
+        // PopOver 组件接收的 offset 格式为 { x: number, y: number }
+        return {
+          x: popOver.offset.left || 0,
+          y: popOver.offset.top || 0
+        };
+      }
+
       renderPopOver() {
         let {
           popOver,
@@ -311,7 +324,7 @@ export const HocPopOver =
                 'PopOverAble-popover',
                 (popOver as SchemaPopOverObject).popOverClassName
               )}
-              offset={(popOver as SchemaPopOverObject).offset}
+              offset={this.getOffset()}
               onMouseLeave={
                 (popOver as SchemaPopOverObject)?.trigger === 'hover'
                   ? this.closePopOver

@@ -26,6 +26,16 @@ icon:
             "label": "普通标签",
             "color": "processing"
         },
+        {
+            "type": "tag",
+            "label": "这是一个很长长长长长长长长长长长长长的标签",
+            "color": "success"
+        },
+        {
+            "type": "tag",
+            "label": "这是一个很长长长长长长长长长长长长长的标签",
+            "closable": true
+        }
     ]
 }
 ```
@@ -70,6 +80,55 @@ icon:
     ]
 }
 ```
+
+## 标签颜色
+
+标签有几种预设的色彩样式，可以通过设置color属性为active、inactive、error、success、iprocessing、warning用作不同场景使用。如果预设值不能满足需求，可以设置为具体的色值
+
+```schema
+{
+    "type": "page",
+    "body": [
+        {
+            "type": "tag",
+            "label": "active",
+            "displayMode": "normal",
+            "color": "active"
+        },
+        {
+            "type": "tag",
+            "label": "inactive",
+            "displayMode": "normal",
+            "color": "inactive"
+        },
+        {
+            "type": "tag",
+            "label": "error",
+            "displayMode": "normal",
+            "color": "error"
+        },
+        {
+            "type": "tag",
+            "label": "success",
+            "displayMode": "normal",
+            "color": "success"
+        },
+        {
+            "type": "tag",
+            "label": "processing",
+            "displayMode": "normal",
+            "color": "processing"
+        },
+        {
+            "type": "tag",
+            "label": "warning",
+            "displayMode": "normal",
+            "color": "warning"
+        }
+    ]
+}
+```
+
 
 ## 自定义样式
 
@@ -123,5 +182,5 @@ icon:
 | color       | `'active' \| 'inactive' \| 'error' \| 'success' \| 'processing' \| 'warning' \| 具体色值 ` |            | 颜色主题，提供默认主题，并支持自定义颜色值 |
 | label       | `string`                                                                                   | `-`        | 标签内容                                   |
 | icon        | `SchemaIcon`                                                                               | `dot 图标` | status 模式下的前置图标                    |
-| className   | `string`    |        | 自定义 CSS 样式类名      |
-| style       | `object`    |   {}     | 自定义样式（行内样式），优先级最高     |
+| className   | `string`                                                                                   |            | 自定义 CSS 样式类名                        |
+| style       | `object`                                                                                   | {}         | 自定义样式（行内样式），优先级最高         |

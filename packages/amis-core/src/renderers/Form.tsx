@@ -1,4 +1,5 @@
 import React from 'react';
+import extend from 'lodash/extend';
 import {Renderer, RendererProps} from '../factory';
 import {FormStore, IFormStore} from '../store/form';
 import {
@@ -48,6 +49,8 @@ export interface FormHorizontal {
   leftFixed?: boolean | number | 'xs' | 'sm' | 'md' | 'lg';
   justify?: boolean; // 两端对齐
   labelAlign?: 'left' | 'right'; // label对齐方式
+  /** label自定义宽度，默认单位为px */
+  labelWidth?: number | string;
 }
 
 export interface FormSchemaBase {
@@ -82,6 +85,41 @@ export interface FormSchemaBase {
    * 是否开启调试，开启后会在顶部实时显示表单项数据。
    */
   debug?: boolean;
+
+  /**
+   * Debug面板配置
+   */
+  debugConfig?: {
+    /**
+     * 默认展开的级别
+     */
+    levelExpand?: number;
+
+    /**
+     * 是否可复制
+     */
+    enableClipboard?: boolean;
+
+    /**
+     * 图标风格
+     */
+    iconStyle?: 'square' | 'circle' | 'triangle';
+
+    /**
+     * 是否显示键的引号
+     */
+    quotesOnKeys?: boolean;
+
+    /**
+     * 是否为键排序
+     */
+    sortKeys?: boolean;
+
+    /**
+     * 设置字符串的最大展示长度，超出长度阈值的字符串将被截断，点击value可切换字符串展示方式，默认为120
+     */
+    ellipsisThreshold?: number | false;
+  };
 
   /**
    * 用来初始化表单数据
@@ -132,6 +170,11 @@ export interface FormSchemaBase {
    * 是否开启本地缓存
    */
   persistData?: string;
+
+  /**
+   * 开启本地缓存后限制保存哪些 key
+   */
+  persistDataKeys?: string[];
 
   /**
    * 提交成功后清空本地缓存
@@ -282,6 +325,11 @@ export interface FormSchemaBase {
    * 表单label的对齐方式
    */
   labelAlign?: LabelAlign;
+
+  /**
+   * label自定义宽度，默认单位为px
+   */
+  labelWidth?: number | string;
 }
 
 export type FormGroup = FormSchemaBase & {
@@ -302,7 +350,7 @@ export interface FormProps
   lazyLoad?: boolean;
   simpleMode?: boolean;
   onInit?: (values: object, props: any) => any;
-  onReset?: (values: object) => void;
+  onReset?: (values: object, action?: any) => void;
   onSubmit?: (values: object, action: any) => any;
   onChange?: (values: object, diff: object, props: any) => any;
   onFailed?: (reason: string, errors: any) => any;
@@ -827,7 +875,7 @@ export default class Form extends React.Component<FormProps, object> {
     submit: boolean,
     changePristine = false
   ) {
-    const {store, formLazyChange} = this.props;
+    const {store, formLazyChange, persistDataKeys} = this.props;
     if (typeof name !== 'string') {
       return;
     }
@@ -839,7 +887,7 @@ export default class Form extends React.Component<FormProps, object> {
     }
 
     if (store.persistData && store.inited) {
-      store.setLocalPersistData();
+      store.setLocalPersistData(persistDataKeys);
     }
   }
   formItemDispatchEvent(dispatchEvent: any) {
@@ -899,29 +947,41 @@ export default class Form extends React.Component<FormProps, object> {
   }
 
   handleFormSubmit(e: React.UIEvent<any>) {
-    const {preventEnterSubmit} = this.props;
+    const {preventEnterSubmit, onActionSensor} = this.props;
 
     e.preventDefault();
     if (preventEnterSubmit) {
       return false;
     }
 
-    return this.handleAction(
+    const sensor: any = this.handleAction(
       e,
       {
         type: 'submit'
       },
       this.props.store.data
     );
+
+    // 让外层可以监控这个动作执行结果
+    onActionSensor?.(sensor);
+    return sensor;
   }
 
-  handleAction(
+  handleReset(action: any) {
+    const {onReset} = this.props;
+
+    return (data: any) => {
+      onReset && onReset(data, action);
+    };
+  }
+
+  async handleAction(
     e: React.UIEvent<any> | void,
     action: ActionObject,
     data: object,
     throwErrors: boolean = false,
     delegate?: IScopedContext
-  ): any {
+  ): Promise<any> {
     const {
       store,
       onSubmit,
@@ -960,35 +1020,30 @@ export default class Form extends React.Component<FormProps, object> {
       data = store.data;
     }
     if (Array.isArray(action.required) && action.required.length) {
+      /** 如果是按钮指定了required，则校验前先清空一下遗留的校验报错 */
+      store.clearErrors();
+
       const fields = action.required.map(item => ({
         name: item,
         rules: {isRequired: true}
       }));
+      const validationRes = await store.validateFields(fields);
 
-      return store.validateFields(fields).then(async result => {
-        if (!result) {
-          const dispatcher = await dispatchEvent(
-            'validateError',
-            this.props.data
-          );
-          if (!dispatcher?.prevented) {
-            env.notify('error', __('Form.validateFailed'));
-          }
-
-          /** 抛异常是为了在dialog中catch这个错误，避免弹窗直接关闭 */
-          return Promise.reject(__('Form.validateFailed'));
-        } else {
-          dispatchEvent('validateSucc', this.props.data);
-          this.handleAction(
-            e,
-            {...action, required: undefined},
-            data,
-            throwErrors,
-            delegate
-          );
+      if (!validationRes) {
+        const dispatcher = await dispatchEvent(
+          'validateError',
+          this.props.data
+        );
+        if (!dispatcher?.prevented) {
+          env.notify('error', __('Form.validateFailed'));
         }
-        return;
-      });
+
+        /** 抛异常是为了在dialog中catch这个错误，避免弹窗直接关闭 */
+        return Promise.reject(__('Form.validateFailed'));
+      } else {
+        /** 重置validated状态，保证submit时触发表单中的校验项 */
+        store.clearErrors();
+      }
     }
     if (
       action.type === 'submit' ||
@@ -1000,9 +1055,9 @@ export default class Form extends React.Component<FormProps, object> {
       store.setCurrentAction(action);
 
       if (action.actionType === 'reset-and-submit') {
-        store.reset(onReset);
+        store.reset(this.handleReset(action));
       } else if (action.actionType === 'clear-and-submit') {
-        store.clear(onReset);
+        store.clear(this.handleReset(action));
       }
 
       return this.submit((values): any => {
@@ -1104,8 +1159,8 @@ export default class Form extends React.Component<FormProps, object> {
             return values;
           }
 
-          resetAfterSubmit && store.reset(onReset);
-          clearAfterSubmit && store.clear(onReset);
+          resetAfterSubmit && store.reset(this.handleReset(action));
+          clearAfterSubmit && store.clear(this.handleReset(action));
           clearPersistDataAfterSubmit && store.clearLocalPersistData();
 
           if (action.redirect || redirect) {
@@ -1450,7 +1505,8 @@ export default class Form extends React.Component<FormProps, object> {
       lazyChange,
       formLazyChange,
       dispatchEvent,
-      labelAlign
+      labelAlign,
+      labelWidth
     } = props;
 
     const subProps = {
@@ -1464,6 +1520,7 @@ export default class Form extends React.Component<FormProps, object> {
       formMode: mode,
       formHorizontal: horizontal,
       formLabelAlign: labelAlign !== 'left' ? 'right' : labelAlign,
+      formLabelWidth: labelWidth,
       controlWidth,
       disabled: disabled || (control as Schema).disabled || form.loading,
       btnDisabled: disabled || form.loading || form.validating,
@@ -1504,6 +1561,7 @@ export default class Form extends React.Component<FormProps, object> {
       className,
       classnames: cx,
       debug,
+      debugConfig,
       $path,
       store,
       columnCount,
@@ -1542,11 +1600,21 @@ export default class Form extends React.Component<FormProps, object> {
         {/* 实现回车自动提交 */}
         <input type="submit" style={{display: 'none'}} />
 
-        {debug ? (
-          <pre>
-            <code>{JSON.stringify(store.data, null, 2)}</code>
-          </pre>
-        ) : null}
+        {debug
+          ? render(
+              'form-debug-json',
+              extend(
+                {
+                  type: 'json',
+                  value: store.data,
+                  ellipsisThreshold: 120,
+                  className: cx('Form--debug')
+                },
+                /** 定制debug输出格式 */
+                isObject(debugConfig) ? debugConfig : {}
+              )
+            )
+          : null}
 
         {render(
           'spinner',

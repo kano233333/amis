@@ -4,7 +4,7 @@
 
 import type CodeMirror from 'codemirror';
 import {eachTree} from 'amis-core';
-import type {FormulaEditorProps, VariableItem} from './Editor';
+import {FormulaEditorProps, VariableItem, FormulaEditor} from './Editor';
 
 export function editorFactory(
   dom: HTMLElement,
@@ -35,6 +35,7 @@ export class FormulaPlugin {
     if (value) {
       // todo functions 也需要自动替换
       this.autoMark(variables!);
+      this.focus(value);
     }
   }
 
@@ -76,7 +77,7 @@ export class FormulaPlugin {
     if (braces.length) {
       for (let index = 0; index < braces.length; index++) {
         const brace = braces[index];
-        if (from > brace.begin && to <= brace.end) {
+        if (from >= brace.begin && to <= brace.end) {
           isIn = true;
           break;
         }
@@ -172,14 +173,13 @@ export class FormulaPlugin {
 
     eachTree(variables, item => {
       if (item.value) {
-        const key = item.value;
-        varMap[key] = item.label;
+        varMap[item.value] = item.label;
       }
     });
     const vars = Object.keys(varMap).sort((a, b) => b.length - a.length);
-
     const editor = this.editor;
     const lines = editor.lineCount();
+    const {evalMode = true} = this.getProps();
     for (let line = 0; line < lines; line++) {
       const content = editor.getLine(line);
 
@@ -200,27 +200,47 @@ export class FormulaPlugin {
         return _;
       });
 
+      const REPLACE_KEY = 'AMIS_FORMULA_REPLACE_KEY';
       // 标记变量
       vars.forEach(v => {
         let from = 0;
         let idx = -1;
         while (~(idx = content.indexOf(v, from))) {
-          this.markText(
-            {
-              line: line,
-              ch: idx
-            },
-            {
-              line: line,
-              ch: idx + v.length
-            },
-            varMap[v],
-            'cm-field'
+          const encode = FormulaEditor.replaceStrByIndex(
+            content,
+            idx,
+            v,
+            REPLACE_KEY
           );
+          const reg = FormulaEditor.getRegExpByMode(evalMode, REPLACE_KEY);
+
+          if (reg.test(encode)) {
+            this.markText(
+              {
+                line: line,
+                ch: idx
+              },
+              {
+                line: line,
+                ch: idx + v.length
+              },
+              varMap[v],
+              'cm-field'
+            );
+          }
+
           from = idx + v.length;
         }
       });
     }
+  }
+
+  // 焦点放在最后
+  focus(value: string) {
+    this.editor.setCursor({
+      line: 0,
+      ch: value?.length || 0
+    });
   }
 
   dispose() {}

@@ -500,7 +500,16 @@ export function promisify<T extends Function>(
   return promisified;
 }
 
-export function getScrollParent(node: HTMLElement): HTMLElement | null {
+/**
+ *
+ * @param node 当前元素
+ * @param compute 自定义计算，找到的父元素是否满足特殊场景
+ * @returns 返回控制当前元素滚动的父元素
+ */
+export function getScrollParent(
+  node: HTMLElement,
+  compute: (parent: HTMLElement) => boolean = () => true
+): HTMLElement | null {
   if (node == null) {
     return null;
   }
@@ -516,11 +525,11 @@ export function getScrollParent(node: HTMLElement): HTMLElement | null {
     style.getPropertyValue('overflow-x') +
     style.getPropertyValue('overflow-y');
 
-  if (/auto|scroll/.test(text) || node.nodeName === 'BODY') {
+  if (node.nodeName === 'BODY' || (/auto|scroll/.test(text) && compute(node))) {
     return node;
   }
 
-  return getScrollParent(node.parentNode as HTMLElement);
+  return getScrollParent(node.parentNode as HTMLElement, compute);
 }
 
 /**
@@ -569,12 +578,16 @@ export function difference<
   return changes(object, base);
 }
 
-export const padArr = (arr: Array<any>, size = 4): Array<Array<any>> => {
-  const ret: Array<Array<any>> = [];
+export const padArr = (
+  arr: Array<any>,
+  size = 4,
+  fillUndefined = false
+): Array<Array<any>> => {
+  const ret: Array<Array<any>> = [[]];
   const pool: Array<any> = arr.concat();
   let from = 0;
 
-  while (pool.length) {
+  while (pool.length || (fillUndefined && ret[ret.length - 1].length < size)) {
     let host: Array<any> = ret[from] || (ret[from] = []);
 
     if (host.length >= size) {
@@ -780,14 +793,16 @@ export function mapTree<T extends TreeItem>(
  */
 export function eachTree<T extends TreeItem>(
   tree: Array<T>,
-  iterator: (item: T, key: number, level: number) => any,
-  level: number = 1
+  iterator: (item: T, key: number, level: number, paths?: Array<T>) => any,
+  level: number = 1,
+  paths: Array<T> = []
 ) {
   tree.map((item, index) => {
-    iterator(item, index, level);
+    let currentPath = paths.concat(item);
+    iterator(item, index, level, currentPath);
 
     if (item.children?.splice) {
-      eachTree(item.children, iterator, level + 1);
+      eachTree(item.children, iterator, level + 1, currentPath);
     }
   });
 }
@@ -1008,6 +1023,44 @@ export function flattenTree<T extends TreeItem, U>(
 }
 
 /**
+ * 将树打平变成一维数组，用法和flattenTree类似，区别是结果仅保留叶节点
+ *
+ * 比如：
+ *
+ * flattenTreeWithLeafNodes([
+ *     {
+ *         id: 1,
+ *         children: [
+ *              { id: 2 },
+ *              { id: 3 },
+ *         ]
+ *     }
+ * ], item => item.id); // 输出为 [2, 3]
+ *
+ * @param tree
+ * @param mapper
+ */
+export function flattenTreeWithLeafNodes<T extends TreeItem>(
+  tree: Array<T>
+): Array<T>;
+export function flattenTreeWithLeafNodes<T extends TreeItem, U>(
+  tree: Array<T>,
+  mapper: (value: T, index: number) => U
+): Array<U>;
+export function flattenTreeWithLeafNodes<T extends TreeItem, U>(
+  tree: Array<T>,
+  mapper?: (value: T, index: number) => U
+): Array<U> {
+  let flattened: Array<any> = [];
+  eachTree(tree, (item, index) => {
+    if (!item.hasOwnProperty('children')) {
+      flattened.push(mapper ? mapper(item, index) : item);
+    }
+  });
+  return flattened;
+}
+
+/**
  * 操作树，遵循 imutable, 每次返回一个新的树。
  * 类似数组的 splice 不同的地方这个方法不修改原始数据，
  * 同时第二个参数不是下标，而是下标数组，分别代表每一层的下标。
@@ -1211,7 +1264,8 @@ export function qsparse(
   options: any = {
     arrayFormat: 'indices',
     encodeValuesOnly: true,
-    depth: 1000 // 默认是 5， 所以condition-builder只要来个条件组就会导致报错
+    depth: 1000, // 默认是 5， 所以condition-builder只要来个条件组就会导致报错
+    arrayLimit: 1000 /** array元素数量超出限制，会被自动转化为object格式，默认值1000 */
   }
 ) {
   return qs.parse(data, options);
@@ -1300,10 +1354,32 @@ export function chainEvents(props: any, schema: any) {
   return ret;
 }
 
-export function mapObject(value: any, fn: Function): any {
+export function mapObject(
+  value: any,
+  fn: Function,
+  skipFn?: (value: any) => boolean
+): any {
+  // 如果value值满足skipFn条件则不做map操作
+  skipFn =
+    skipFn && typeof skipFn === 'function'
+      ? skipFn
+      : (value: any): boolean => {
+          // File类型处理之后会变成plain object
+          if (value instanceof File) {
+            return true;
+          }
+
+          return false;
+        };
+
+  if (!!skipFn(value)) {
+    return value;
+  }
+
   if (Array.isArray(value)) {
     return value.map(item => mapObject(item, fn));
   }
+
   if (isObject(value)) {
     let tmpValue = {...value};
     Object.keys(tmpValue).forEach(key => {
@@ -1422,10 +1498,14 @@ export function getScrollbarWidth() {
 }
 
 // 后续改用 FormulaExec['formula']
-function resolveValueByName(data: any, name?: string) {
+function resolveValueByName(
+  data: any,
+  name?: string,
+  canAccessSuper?: boolean
+) {
   return isPureVariable(name)
     ? resolveVariableAndFilter(name, data)
-    : resolveVariable(name, data);
+    : resolveVariable(name, data, canAccessSuper);
 }
 
 // 统一的获取 value 值方法
@@ -1436,10 +1516,13 @@ export function getPropValue<
     data?: any;
     defaultValue?: any;
   }
->(props: T, getter?: (props: T) => any) {
+>(props: T, getter?: (props: T) => any, canAccessSuper?: boolean) {
   const {name, value, data, defaultValue} = props;
   return (
-    value ?? getter?.(props) ?? resolveValueByName(data, name) ?? defaultValue
+    value ??
+    getter?.(props) ??
+    resolveValueByName(data, name, canAccessSuper) ??
+    defaultValue
   );
 }
 

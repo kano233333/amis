@@ -63,7 +63,8 @@ import FormItem, {
   FormControlProps,
   FormItemWrap,
   FormItemProps,
-  registerFormItem
+  registerFormItem,
+  getFormItemByName
 } from './renderers/Item';
 import {
   FormOptionsControl,
@@ -88,6 +89,8 @@ import {
   registerFilter
 } from 'amis-formula';
 import LazyComponent from './components/LazyComponent';
+import Overlay from './components/Overlay';
+import PopOver from './components/PopOver';
 import {FormHorizontal, FormRenderer} from './renderers/Form';
 import {enableDebug, promisify, replaceText, wrapFetcher} from './utils/index';
 
@@ -113,6 +116,7 @@ export {
   unRegisterRenderer,
   getRenderers,
   registerFormItem,
+  getFormItemByName,
   registerOptionsControl,
   resolveRenderer,
   filterSchema,
@@ -150,6 +154,8 @@ export {
   evaluate,
   // 其他
   LazyComponent,
+  Overlay,
+  PopOver,
   addSchemaFilter,
   OptionsControlProps,
   FormOptionsControl,

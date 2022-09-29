@@ -15,12 +15,88 @@ order: 9
 ```schema: scope="body"
 {
     "type": "form",
+    "debug": true,
     "api": "/api/mock2/form/saveForm",
     "body": [
         {
         "name": "checkboxes",
         "type": "checkboxes",
         "label": "复选框",
+        "options": [
+            {
+                "label": "OptionA",
+                "value": "a"
+            },
+            {
+                "label": "OptionB",
+                "value": "b"
+            },
+            {
+                "label": "OptionC",
+                "value": "c"
+            },
+            {
+                "label": "OptionD",
+                "value": "d"
+            }
+            ]
+        }
+    ]
+}
+```
+
+## 结果是数组模式
+
+默认是拼接成字符串，如果希望结果是数组，可以设置 `"joinValues": false`
+
+```schema: scope="body"
+{
+    "type": "form",
+    "api": "/api/mock2/form/saveForm",
+    "debug": true,
+    "body": [
+        {
+        "name": "checkboxes",
+        "type": "checkboxes",
+        "label": "复选框",
+        "joinValues": false,
+        "options": [
+            {
+                "label": "OptionA",
+                "value": "a"
+            },
+            {
+                "label": "OptionB",
+                "value": "b"
+            },
+            {
+                "label": "OptionC",
+                "value": "c"
+            },
+            {
+                "label": "OptionD",
+                "value": "d"
+            }
+            ]
+        }
+    ]
+}
+```
+
+如果只想提取 value，需要加上 `"extractValue": true`
+
+```schema: scope="body"
+{
+    "type": "form",
+    "api": "/api/mock2/form/saveForm",
+    "debug": true,
+    "body": [
+        {
+        "name": "checkboxes",
+        "type": "checkboxes",
+        "label": "复选框",
+        "joinValues": false,
+        "extractValue": true,
         "options": [
             {
                 "label": "OptionA",
@@ -319,6 +395,47 @@ order: 9
 }
 ```
 
+## 自定义选项渲染
+
+> 2.0.0 及以上版本
+
+```schema: scope="body"
+{
+    "type": "form",
+    "api": "/api/mock2/form/saveForm",
+    "body": [
+        {
+            "name": "checkboxes",
+            "type": "checkboxes",
+            "label": "复选框",
+            "menuTpl": "<span class='label label-${klass}'>${label}</span>",
+            "options": [
+                {
+                    "label": "OptionA",
+                    "value": "a",
+                    "klass": "success"
+                },
+                {
+                    "label": "OptionB",
+                    "value": "b",
+                    "klass": "danger"
+                },
+                {
+                    "label": "OptionC",
+                    "value": "c",
+                    "klass": "warning"
+                },
+                {
+                    "label": "OptionD",
+                    "value": "d",
+                    "klass": "info"
+                }
+            ]
+        }
+    ]
+}
+```
+
 ## 属性表
 
 当做选择器表单项使用时，除了支持 [普通表单项属性表](./formitem#%E5%B1%9E%E6%80%A7%E8%A1%A8) 中的配置以外，还支持下面一些配置
@@ -333,6 +450,7 @@ order: 9
 | joinValues      | `boolean`                                 | `true`       | [拼接值](./options#%E6%8B%BC%E6%8E%A5%E5%80%BC-joinvalues)                                                          |
 | extractValue    | `boolean`                                 | `false`      | [提取值](./options#%E6%8F%90%E5%8F%96%E5%A4%9A%E9%80%89%E5%80%BC-extractvalue)                                      |
 | columnsCount    | `number`                                  | `1`          | 选项按几列显示，默认为一列                                                                                          |
+| menuTpl         | `string`                                  |              | 支持自定义选项渲染                                                                                                  |
 | checkAll        | `boolean`                                 | `false`      | 是否支持全选                                                                                                        |
 | inline          | `boolean`                                 | `true`       | 是否显示为一行                                                                                                      |
 | defaultCheckAll | `boolean`                                 | `false`      | 默认是否全选                                                                                                        |
@@ -345,6 +463,9 @@ order: 9
 | editApi         | [API](../../docs/types/api)               |              | [配置编辑选项接口](./options#%E9%85%8D%E7%BD%AE%E7%BC%96%E8%BE%91%E6%8E%A5%E5%8F%A3-editapi)                        |
 | removable       | `boolean`                                 | `false`      | [删除选项](./options#%E5%88%A0%E9%99%A4%E9%80%89%E9%A1%B9)                                                          |
 | deleteApi       | [API](../../docs/types/api)               |              | [配置删除选项接口](./options#%E9%85%8D%E7%BD%AE%E5%88%A0%E9%99%A4%E6%8E%A5%E5%8F%A3-deleteapi)                      |
+| optionType      | `default` \| `button`                     | `default`    | 按钮模式                                                                                                            |
+| itemClassName   | `string`                                  |              | 选项样式类名                                                                                                        |
+| labelClassName  | `string`                                  |              | 选项标签样式类名                                                                                                    |
 
 ## 事件表
 

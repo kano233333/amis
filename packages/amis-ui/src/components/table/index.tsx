@@ -12,9 +12,17 @@ import filter from 'lodash/filter';
 import intersection from 'lodash/intersection';
 import Sortable from 'sortablejs';
 
-import {themeable, ClassNamesFn, ThemeProps} from 'amis-core';
-import {localeable, LocaleProps} from 'amis-core';
-import {isObject, isBreakpoint, guid, autobind} from 'amis-core';
+import {
+  themeable,
+  ClassNamesFn,
+  ThemeProps,
+  localeable,
+  LocaleProps,
+  isObject,
+  isBreakpoint,
+  guid,
+  autobind
+} from 'amis-core';
 import {Icon} from '../icons';
 import CheckBox from '../Checkbox';
 import Spinner from '../Spinner';
@@ -27,7 +35,7 @@ import Cell from './Cell';
 
 export interface ColumnProps {
   title: string | React.ReactNode | Function;
-  key: string;
+  name: string;
   className?: Function;
   children?: Array<ColumnProps>;
   render: Function;
@@ -66,7 +74,7 @@ export interface RowSelectionOptionProps {
 
 export interface RowSelectionProps {
   type: string;
-  rowClick: boolean; // 点击复选框选中还是点击整行选中
+  rowClick?: boolean; // 点击复选框选中还是点击整行选中
   fixed: boolean; // 只能固定在左边
   selectedRowKeys: Array<string | number>;
   keyField?: string; // 默认是key，可自定义
@@ -74,6 +82,7 @@ export interface RowSelectionProps {
   selections?: Array<RowSelectionOptionProps>;
   onChange?: Function;
   getCheckboxProps: Function;
+  maxSelectedLength?: number;
 }
 
 export interface ExpandableProps {
@@ -348,10 +357,9 @@ export class Table extends React.PureComponent<TableProps, TableState> {
       colWidths: [],
       hoverRow: null
     };
-
-    this.getPopOverContainer = this.getPopOverContainer.bind(this);
   }
 
+  @autobind
   getPopOverContainer() {
     return findDOMNode(this);
   }
@@ -368,11 +376,9 @@ export class Table extends React.PureComponent<TableProps, TableState> {
   sortable: Sortable | null;
   // 记录点击起始横坐标
   resizeStart: number;
-  resizeKey: string;
-  resizeTarget: HTMLElement | null;
+  // 记录点击对应col
+  resizeTarget: Array<HTMLElement | null>;
   resizeWidth: number;
-  // 可以拖拽的最长距离
-  resizeMaxDistance: number;
 
   tableDom: React.RefObject<HTMLDivElement> = React.createRef();
   theadDom: React.RefObject<HTMLTableSectionElement> = React.createRef();
@@ -387,6 +393,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     const childrens = this.tbodyDom.current?.children[0]?.children || [];
     const colWidths: Array<any> = new Array(childrens ? childrens.length : 0);
 
+    // 分2个table实现表格 为了实现上下table的宽度统一
     for (let i = 0; i < childrens.length; i++) {
       const child: any = childrens[i];
       colWidths[i] = child ? child.offsetWidth : null;
@@ -813,6 +820,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
         ) : null}
         {tdColumns.map((data, index) => {
           const width = colWidths ? colWidths[index + extraCount] : data.width;
+
           return (
             <col
               key={index}
@@ -827,36 +835,27 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     );
   }
 
-  onResizeMouseDown(event: any, key: string) {
+  onResizeMouseDown(event: any, index: number) {
     // 点击记录起始坐标
     this.resizeStart = event.clientX;
-    this.resizeKey = key;
 
-    let index =
-      this.tdColumns.findIndex(c => c.key === key) + this.getExtraColumnCount();
-
-    const colGroup = this.tableDom.current?.getElementsByTagName('colgroup')[0];
+    // 用2个table实现的时候 会出现2个colgroup
+    // 理论上 宽度要始终保持一致
+    const colGroup = this.tableDom.current?.getElementsByTagName('colgroup');
     let currentWidth = 0;
-    let child = null;
-    if (colGroup && colGroup.children[index]) {
-      child = colGroup.children[index] as HTMLElement;
-      currentWidth = child.offsetWidth;
-    }
-    this.resizeWidth = currentWidth;
-    this.resizeTarget = child;
-
+    const children = [];
     if (colGroup) {
-      let maxDistance = 0;
-      for (let i = 0; i < colGroup.children.length; i++) {
-        const child = colGroup.children[i] as HTMLElement;
-        // 自适应列 保证有一个最小宽度
-        // 如果都设置了固定宽度 那一个都拖不动
-        if (!this.tdColumns[i].width) {
-          maxDistance += child.offsetWidth - DefaultCellWidth;
+      for (let i = 0; i < colGroup.length; i++) {
+        const child = colGroup[i].children[index] as HTMLElement;
+        if (child) {
+          currentWidth = child.offsetWidth;
+          children.push(child);
         }
       }
-      this.resizeMaxDistance = maxDistance;
     }
+
+    this.resizeWidth = currentWidth;
+    this.resizeTarget = children;
 
     document.addEventListener('mousemove', this.onResizeMouseMove);
     document.addEventListener('mouseup', this.onResizeMouseUp);
@@ -867,32 +866,25 @@ export class Table extends React.PureComponent<TableProps, TableState> {
   @autobind
   onResizeMouseMove(event: any) {
     // 点击了调整列宽
-    if (this.resizeStart && this.resizeTarget) {
+    if (this.resizeStart) {
       // 计算横向移动距离
       const distance = event.clientX - this.resizeStart;
-      const tdColumns = [...this.tdColumns];
 
       let newWidth = 0;
       // 调宽列
+      // tableLayout为auto情况下 实际宽度并不受width实际控制 表格会根据列内容自动调整
+      // 设置scroll.x或者column设置了width 都会将tableLayout设置为fixed
       if (distance > 0) {
-        newWidth =
-          this.resizeWidth + Math.min(distance, this.resizeMaxDistance);
-        this.resizeTarget.style.width = newWidth + 'px';
+        newWidth = this.resizeWidth + distance;
       } else {
         // 缩短列
         newWidth = Math.max(this.resizeWidth + distance, DefaultCellWidth);
-        this.resizeTarget.style.width = newWidth + 'px';
       }
-
-      const column = find(tdColumns, c => c.key === this.resizeKey);
-      // 只有通过配置设置过的宽度保存到tdColumns
-      // 自动分配的不保存
-      // 这样可以一直调整了
-      if (column && column.width && newWidth) {
-        column.width = newWidth;
-      }
-
-      this.tdColumns = tdColumns;
+      this.resizeTarget.forEach(target => {
+        if (target) {
+          target.style.width = newWidth + 'px';
+        }
+      });
     }
     event && event.stopPropagation();
   }
@@ -903,10 +895,8 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     document.removeEventListener('mouseup', this.onResizeMouseUp);
 
     this.resizeStart = 0;
-    this.resizeKey = '';
     this.resizeWidth = 0;
-    this.resizeTarget = null;
-    this.resizeMaxDistance = 0;
+    this.resizeTarget = [];
   }
 
   renderTHead() {
@@ -923,6 +913,8 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     } = this.props;
 
     const thColumns = this.thColumns;
+    const tdColumns = this.tdColumns;
+
     // 获取一行最多th个数
     let maxCount = 0;
     thColumns.forEach(columns => {
@@ -943,14 +935,17 @@ export class Table extends React.PureComponent<TableProps, TableState> {
 
     let allRowKeys: Array<string> = [];
     let allRows: Array<any> = [];
+    const maxSelectedLength = rowSelection?.maxSelectedLength;
     dataList.forEach(data => {
-      allRowKeys.push(data[keyField]);
-      allRows.push(data);
-      if (!expandable && this.hasChildrenRow(data)) {
-        allRowKeys = [...allRowKeys, ...this.getDataChildrenKeys(data)];
-        data[this.getChildrenColumnName()].forEach((item: any) =>
-          allRows.push(item)
-        );
+      if (!!maxSelectedLength && allRows.length < maxSelectedLength) {
+        allRowKeys.push(data[keyField]);
+        allRows.push(data);
+        if (!expandable && this.hasChildrenRow(data)) {
+          allRowKeys = [...allRowKeys, ...this.getDataChildrenKeys(data)];
+          data[this.getChildrenColumnName()].forEach((item: any) =>
+            allRows.push(item)
+          );
+        }
       }
     });
 
@@ -997,8 +992,8 @@ export class Table extends React.PureComponent<TableProps, TableState> {
                             if (onSelectAll) {
                               const prevented = await onSelectAll(
                                 selectedRows,
-                                value ? [] : selectedRows,
-                                changeRows
+                                value ? selectedRowKeys : [],
+                                value ? [] : selectedRows
                               );
                               if (prevented) {
                                 return;
@@ -1070,18 +1065,28 @@ export class Table extends React.PureComponent<TableProps, TableState> {
                   );
                 }
 
-                const children = (
+                // th的最后一行才可调整列宽
+                // 分组情况下 最后一行才和列配置个数对应
+                // 就可以根据index找到col 不依赖name
+                const noChildren = !item.children?.length;
+                let cIndex = -1;
+                if (noChildren) {
+                  // 根据name去tdColumns匹配出index
+                  // 没设置name的 那一定不是要绑定数据的列 一般都是分组的上层 也不会出现调整列宽
+                  cIndex = tdColumns.findIndex(c => c.name === item.name);
+                }
+                const children = !item.children?.length ? (
                   <span>
                     {sort}
                     {filter}
                     {resizable ? (
                       <i
                         className={cx('Table-thead-resizable')}
-                        onMouseDown={e => this.onResizeMouseDown(e, item.key)}
+                        onMouseDown={e => this.onResizeMouseDown(e, cIndex)}
                       ></i>
                     ) : null}
                   </span>
-                );
+                ) : null;
 
                 return (
                   <Cell
@@ -1196,7 +1201,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     }
   }
 
-  onMouseLeave(event: React.ChangeEvent<any>) {
+  onMouseLeave() {
     this.setState({hoverRow: null});
   }
 
@@ -1397,7 +1402,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     const cells = tdColumns.map((item, i) => {
       const render =
         item.render && typeof item.render === 'function'
-          ? item.render(data[item.key], data, rowIndex, i)
+          ? item.render(data[item.name], data, rowIndex, i)
           : null;
       let props = {rowSpan: 1, colSpan: 1};
       let children = render;
@@ -1437,7 +1442,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
             {i === 0 && hasChildrenRow
               ? this.getExpandedIcons(isExpanded, data)
               : null}
-            {render ? children : data[item.key]}
+            {render ? children : data[item.name]}
           </div>
         </Cell>
       );
@@ -1488,6 +1493,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
       this.state.selectedRowKeys,
       key => key === data[defaultKey]
     );
+
     const hasChildrenChecked = this.hasCheckedChildrenRows(data);
     const isRadio = rowSelection && rowSelection.type === 'radio';
 
@@ -1523,7 +1529,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
               type={rowSelection.type || 'checkbox'}
               partial={!isRadio && hasChildrenChecked && !isChecked}
               checked={isRadio ? isChecked : hasChildrenChecked || isChecked}
-              onChange={(value, shift) => {
+              onChange={(value: boolean) => {
                 if (!(rowSelection && rowSelection.rowClick)) {
                   this.selectedSingleRow(value, data);
                 }
@@ -1770,6 +1776,11 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     // 设置了横向滚动轴 则table的table-layout为fixed
     const hasScrollX = scroll && scroll.x;
     const hoverRow = this.state.hoverRow;
+    // 如果设置了列宽 那么table-layout为fixed才能生效
+    const columnWidth = this.tdColumns.some(item => item.width);
+
+    const tableLayout = hasScrollX || columnWidth ? 'fixed' : 'auto';
+    const tableStyle = hasScrollX ? {width: scroll.x + 'px'} : {};
 
     return (
       <div
@@ -1787,11 +1798,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
           </ItemActionsWrapper>
         ) : null}
         <table
-          style={
-            hasScrollX
-              ? {width: scroll.x + 'px', tableLayout: 'fixed'}
-              : {tableLayout: 'auto'}
-          }
+          style={{...tableStyle, tableLayout}}
           className={cx('Table-table')}
         >
           {this.renderColGroup()}
@@ -1950,7 +1957,7 @@ export class Table extends React.PureComponent<TableProps, TableState> {
     return (
       <div
         ref={this.tableDom}
-        className={cx('Table-v2', className, {
+        className={cx('Table2', className, {
           [cx('Table-scroll-horizontal')]: hasScrollX,
           [cx(`Table-${size}`)]: size,
           [cx('Table-bordered')]: bordered,

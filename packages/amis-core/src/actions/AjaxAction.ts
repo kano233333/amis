@@ -32,6 +32,11 @@ export interface IAjaxAction extends ListenerAction {
  * @implements {Action}
  */
 export class AjaxAction implements RendererAction {
+  fetcherType: string;
+  constructor(fetcherType: string = 'ajax') {
+    this.fetcherType = fetcherType;
+  }
+
   async run(
     action: IAjaxAction,
     renderer: ListenerContext,
@@ -39,6 +44,11 @@ export class AjaxAction implements RendererAction {
   ) {
     if (!renderer.props.env?.fetcher) {
       throw new Error('env.fetcher is required!');
+    }
+    if (this.fetcherType === 'download' && action.actionType === 'download') {
+      if ((action as any).args?.api) {
+        (action as any).args.api.responseType = 'blob';
+      }
     }
 
     const env = event.context.env;
@@ -48,33 +58,56 @@ export class AjaxAction implements RendererAction {
         omit(action.args ?? {}, ['api', 'options', 'messages']),
         action.args?.options ?? {}
       );
+      const responseData =
+        !isEmpty(result.data) || result.ok
+          ? normalizeApiResponseData(result.data)
+          : null;
 
-      if (!isEmpty(result.data) || result.ok) {
-        const responseData = normalizeApiResponseData(result.data);
-        // 记录请求返回的数据
-        event.setData(
-          createObject(
-            event.data,
-            action.outputVar
-              ? {
-                  [`${action.outputVar}`]: responseData
-                }
-              : responseData
-          )
-        );
+      // 记录请求返回的数据
+      event.setData(
+        createObject(event.data, {
+          ...responseData, // 兼容历史配置
+          responseData: responseData,
+          [action.outputVar || 'responseResult']: {
+            ...responseData,
+            responseData,
+            responseStatus: result.status,
+            responseMsg: result.msg
+          }
+        })
+      );
+
+      if (!action.args?.options?.silent) {
+        if (!result.ok) {
+          throw new ServerError(
+            action.args?.messages?.failed ?? result.msg,
+            result
+          );
+        } else {
+          const msg =
+            action.args?.messages?.success ?? result.msg ?? result.defaultMsg;
+          msg &&
+            env.notify(
+              'success',
+              msg,
+              result.msgTimeout !== undefined
+                ? {
+                    closeButton: true,
+                    timeout: result.msgTimeout
+                  }
+                : undefined
+            );
+        }
       }
 
-      if (!result.ok) {
-        throw new ServerError(
-          action.args?.messages?.failed ?? result.msg,
-          result
-        );
-      } else {
-        const msg = action.args?.messages?.success ?? result.msg;
-        msg &&
+      return result.data;
+    } catch (e) {
+      if (!action.args?.options?.silent) {
+        if (e.type === 'ServerError') {
+          const result = (e as ServerError).response;
           env.notify(
-            'success',
-            msg,
+            'error',
+            e.message,
             result.msgTimeout !== undefined
               ? {
                   closeButton: true,
@@ -82,24 +115,9 @@ export class AjaxAction implements RendererAction {
                 }
               : undefined
           );
-      }
-
-      return result.data;
-    } catch (e) {
-      if (e.type === 'ServerError') {
-        const result = (e as ServerError).response;
-        env.notify(
-          'error',
-          e.message,
-          result.msgTimeout !== undefined
-            ? {
-                closeButton: true,
-                timeout: result.msgTimeout
-              }
-            : undefined
-        );
-      } else {
-        env.notify('error', e.message);
+        } else {
+          env.notify('error', e.message);
+        }
       }
 
       // 不阻塞后面执行
@@ -109,3 +127,5 @@ export class AjaxAction implements RendererAction {
 }
 
 registerAction('ajax', new AjaxAction());
+
+registerAction('download', new AjaxAction('download'));

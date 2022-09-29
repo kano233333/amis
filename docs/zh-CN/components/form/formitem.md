@@ -433,9 +433,9 @@ order: 1
 }
 ```
 
-**tip：** value表达式（`${xxx}`）支持 模板字符串、链式取值、过滤器，详细用法参考[数据映射](../../../docs/concepts/data-mapping)。
+**tip：** value 表达式（`${xxx}`）支持 模板字符串、链式取值、过滤器，详细用法参考[数据映射](../../../docs/concepts/data-mapping)。
 
-我们也可以不设置value表达式，通过 name 来映射当前数据域中某个字段。比如我们表单数据域中有变量`"text1": "hello world!"`，然后我们设置表达项`"name": "text1"`，这样就可以自动映射值了。如下：
+我们也可以不设置 value 表达式，通过 name 来映射当前数据域中某个字段。比如我们表单数据域中有变量`"text1": "hello world!"`，然后我们设置表达项`"name": "text1"`，这样就可以自动映射值了。如下：
 
 ```schema: scope="body"
 {
@@ -455,7 +455,7 @@ order: 1
 }
 ```
 
-关于优先级问题，当我们同时设置了value表达式`${xxx}`和`name`值映射，会优先使用value表达式`${xxx}`。只有当value为普通字符串`非${xxx}`时，才会使用`name`值映射。如下：
+关于优先级问题，当我们同时设置了 value 表达式`${xxx}`和`name`值映射，会优先使用 value 表达式`${xxx}`。只有当 value 为普通字符串`非${xxx}`时，才会使用`name`值映射。如下：
 
 ```schema: scope="body"
 {
@@ -678,7 +678,7 @@ order: 1
 
 ### 字符串形式（不推荐）
 
-也可以配置字符串形式来指定，如下例，输入不合法的值，点击提交会报错并显示报错信息
+也可以配置字符串形式来指定，如下例，输入不合法的值，点击提交会报错并显示报错信息。（注意日期时间类的校验规则不支持字符串形式）
 
 ```schema: scope="body"
 {
@@ -765,7 +765,7 @@ amis 会有默认的报错信息，如果你想自定义校验信息，配置`va
 }
 ```
 
-默认的校验信息如下，可以直接配置文字，也可用多语言中的 key。参考：https://github.com/baidu/amis/blob/master/src/locale/zh-CN.ts#L175-L201
+默认的校验信息如下，可以直接配置文字，也可用多语言中的 key。参考：https://github.com/baidu/amis/blob/master/packages/amis-ui/src/locale/zh-CN.ts#L250
 
 ```js
 {
@@ -794,7 +794,20 @@ amis 会有默认的报错信息，如果你想自定义校验信息，配置`va
   isPhoneNumber: 'validate.isPhoneNumber',
   isTelNumber: 'validate.isTelNumber',
   isZipcode: 'validate.isZipcode',
-  isId: 'validate.isId'
+  isId: 'validate.isId',
+  /* 日期时间相关校验规则 2.2.0 及以上版本生效 */
+  isDateTimeSame: 'validate.isDateTimeSame',
+  isDateTimeBefore: 'validate.isDateTimeBefore',
+  isDateTimeAfter: 'validate.isDateTimeAfter',
+  isDateTimeSameOrBefore: 'validate.isDateTimeSameOrBefore',
+  isDateTimeSameOrAfter: 'validate.isDateTimeSameOrAfter',
+  isDateTimeBetween: 'validate.isDateTimeBetween',
+  isTimeSame: 'validate.isTimeSame',
+  isTimeBefore: 'validate.isTimeBefore',
+  isTimeAfter: 'validate.isTimeAfter',
+  isTimeSameOrBefore: 'validate.isTimeSameOrBefore',
+  isTimeSameOrAfter: 'validate.isTimeSameOrAfter',
+  isTimeBetween: 'validate.isTimeBetween'
 }
 ```
 
@@ -804,31 +817,45 @@ amis 会有默认的报错信息，如果你想自定义校验信息，配置`va
 
 ### 支持的格式校验
 
-- `isEmail` 必须是 Email。
-- `isUrl` 必须是 Url。
-- `isNumeric` 必须是 数值。
-- `isAlpha` 必须是 字母。
-- `isAlphanumeric` 必须是 字母或者数字。
-- `isInt` 必须是 整形。
-- `isFloat` 必须是 浮点形。
-- `isLength:length` 是否长度正好等于设定值。
-- `minLength:length` 最小长度。
-- `maxLength:length` 最大长度。
-- `maximum:number` 最大值。
-- `minimum:number` 最小值。
-- `equals:xxx` 当前值必须完全等于 xxx。
-- `equalsField:xxx` 当前值必须与 xxx 变量值一致。
-- `isJson` 是否是合法的 Json 字符串。
-- `isUrlPath` 是 url 路径。
-- `isPhoneNumber` 是否为合法的手机号码
-- `isTelNumber` 是否为合法的电话号码
-- `isZipcode` 是否为邮编号码
-- `isId` 是否为身份证号码，没做校验
-- `matchRegexp:/foo/` 必须命中某个正则。
-- `matchRegexp1:/foo/` 必须命中某个正则。
-- `matchRegexp2:/foo/` 必须命中某个正则。
-- `matchRegexp3:/foo/` 必须命中某个正则。
-- `matchRegexp4:/foo/` 必须命中某个正则。
+| 规则名称                 | 说明                                                                                           | 定义                                                                                                            | 版本    |
+| ------------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------- |
+| `isEmail`                | 必须是 Email。                                                                                 | `(value: any) => boolean`                                                                                       |         |
+| `isUrl`                  | 必须是 Url。                                                                                   | `(value: any) => boolean`                                                                                       |         |
+| `isNumeric`              | 必须是 数值。                                                                                  | `(value: any) => boolean`                                                                                       |         |
+| `isAlpha`                | 必须是 字母。                                                                                  | `(value: any) => boolean`                                                                                       |         |
+| `isAlphanumeric`         | 必须是 字母或者数字。                                                                          | `(value: any) => boolean`                                                                                       |         |
+| `isInt`                  | 必须是 整形。                                                                                  | `(value: any) => boolean`                                                                                       |         |
+| `isFloat`                | 必须是 浮点形。                                                                                | `(value: any) => boolean`                                                                                       |         |
+| `isLength:length`        | 是否长度正好等于设定值。                                                                       | `(value: any) => boolean`                                                                                       |         |
+| `minLength:length`       | 最小长度。                                                                                     | `(value: any, length: number) => boolean`                                                                       |         |
+| `maxLength:length`       | 最大长度。                                                                                     | `(value: any, length: number) => boolean`                                                                       |         |
+| `maximum:number`         | 最大值。                                                                                       | `(value: any, maximum: number) => boolean`                                                                      |         |
+| `minimum:number`         | 最小值。                                                                                       | `(value: any, minimum:number) => boolean`                                                                       |         |
+| `equals:xxx`             | 当前值必须完全等于 xxx。                                                                       | `(value: any, targetValue: any) => boolean`                                                                     |         |
+| `equalsField:xxx`        | 当前值必须与 xxx 变量值一致。                                                                  | `(value: any, field: string) => boolean`                                                                        |         |
+| `isJson`                 | 是否是合法的 Json 字符串。                                                                     | `(value: any) => boolean`                                                                                       |         |
+| `isUrlPath`              | 是 url 路径。                                                                                  | `(value: any) => boolean`                                                                                       |         |
+| `isPhoneNumber`          | 是否为合法的手机号码                                                                           | `(value: any) => boolean`                                                                                       |         |
+| `isTelNumber`            | 是否为合法的电话号码                                                                           | `(value: any) => boolean`                                                                                       |         |
+| `isZipcode`              | 是否为邮编号码                                                                                 | `(value: any) => boolean`                                                                                       |         |
+| `isId`                   | 是否为身份证号码，没做校验                                                                     | `(value: any) => boolean`                                                                                       |         |
+| `matchRegexp:/foo/`      | 必须命中某个正则。                                                                             | `(value: any, regexp: string \| RegExp) => boolean`                                                             |         |
+| `matchRegexp1:/foo/`     | 必须命中某个正则。                                                                             | `(value: any, regexp: string \| RegExp) => boolean`                                                             |         |
+| `matchRegexp2:/foo/`     | 必须命中某个正则。                                                                             | `(value: any, regexp: string \| RegExp) => boolean`                                                             |         |
+| `matchRegexp3:/foo/`     | 必须命中某个正则。                                                                             | `(value: any, regexp: string \| RegExp) => boolean`                                                             |         |
+| `matchRegexp4:/foo/`     | 必须命中某个正则。                                                                             | `(value: any, regexp: string \| RegExp) => boolean`                                                             |         |
+| `isDateTimeSame`         | 日期和目标日期相同，支持指定粒度，默认到毫秒 `millisecond`                                     | `(value: any, targetDate: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isDateTimeBefore`       | 日期早于目标日期，支持指定粒度，默认到毫秒 `millisecond`                                       | `(value: any, targetDate: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isDateTimeAfter`        | 日期晚于目标日期，支持指定粒度，默认到毫秒 `millisecond`                                       | `(value: any, targetDate: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isDateTimeSameOrBefore` | 日期早于目标日期或和目标日期相同，支持指定粒度，默认到毫秒 `millisecond`                       | `(value: any, targetDate: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isDateTimeSameOrAfter`  | 日期晚于目标日期或和目标日期相同，支持指定粒度，默认到毫秒 `millisecond`                       | `(value: any, targetDate: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isDateTimeBetween`      | 日期处于目标日期范围，支持指定粒度和区间的开闭形式，默认到毫秒 `millisecond`，左右开区间`'()'` | `(value: any, lhs: any, rhs: any, granularity?: string, inclusivity?: '()' \| '[)' \| '(]' \| '[]') => boolean` | `2.2.0` |
+| `isTimeSame`             | 时间和目标时间相同，支持指定粒度，默认到毫秒 `millisecond`                                     | `(value: any, targetTime: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isTimeBefore`           | 时间早于目标时间，支持指定粒度，默认到毫秒 `millisecond`                                       | `(value: any, targetTime: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isTimeAfter`            | 时间晚于目标时间，支持指定粒度，默认到毫秒 `millisecond`                                       | `(value: any, targetTime: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isTimeSameOrBefore`     | 时间早于目标时间或和目标时间相同，支持指定粒度，默认到毫秒 `millisecond`                       | `(value: any, targetTime: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isTimeSameOrAfter`      | 时间晚于目标时间或和目标时间相同，支持指定粒度，默认到毫秒 `millisecond`                       | `(value: any, targetTime: any, granularity?: string) => boolean`                                                | `2.2.0` |
+| `isTimeBetween`          | 时间处于目标时间范围，支持指定粒度和区间的开闭形式，默认到毫秒 `millisecond`，左右开区间`'()'` | `(value: any, lhs: any, rhs: any, granularity?: string, inclusivity?: '()' \| '[)' \| '(]' \| '[]') => boolean` | `2.2.0` |
 
 #### 验证只允许 http 协议的 url 地址
 
@@ -1134,7 +1161,7 @@ Table 类型的表单项，要实现服务端校验，可以使用 `路径key` �
 
 ### 配置自动填充
 
-通过配置 "autoFillApi" 为自动填充数据源接口地址；amis 可以将返回数据自动填充到表单中，例如如下配置；
+通过配置 "autoFill.api" 为自动填充数据源接口地址；amis 可以将返回数据自动填充到表单中，例如如下配置；
 
 ```schema:scope="body"
 {
@@ -1144,14 +1171,22 @@ Table 类型的表单项，要实现服务端校验，可以使用 `路径key` �
       "type": "input-text",
       "label": "浏览器",
       "name": "browser",
-      "autoFillApi": {
-        api: "/api/mock2/form/autoUpdate?browser=$browser",
-        replaceData: {
+      "autoFill": {
+        showSuggestion: false,
+        "fillMapping": {
           browser: "${browser}",
           version: "${version}",
-          platform1: "${platform}",
+          platform: '${platform1}'
         },
-        silent: false
+        api: {
+          url: "/api/mock2/form/autoUpdate?browser=${browser}&version=${version}",
+          responseData: {
+            browser: "${browser}",
+            version: "${version}",
+            platform1: "${platform}",
+          },
+          silent: false
+        }
       }
     },
     {
@@ -1162,7 +1197,7 @@ Table 类型的表单项，要实现服务端校验，可以使用 `路径key` �
     {
       "type": "input-text",
       "label": "平台",
-      "name": "platform1"
+      "name": "platform"
     },
   ]
 }
@@ -1197,32 +1232,115 @@ Table 类型的表单项，要实现服务端校验，可以使用 `路径key` �
 }
 ```
 
+### 配置参照录入
+
+设置 autoFill.showSuggestion 为 true；同时在 autoFill 中配置如下示例参数，可以进行数据的参照录入「当前表单项聚焦或者值变化时弹出 dialog/drawer/popOver 供用户操作」例如如下配置
+
+fillMapping 配置 支持变量取值和表达式；
+如下配置中，如果想一次选中多条数据并映射可如下配置表达式，其中 items 默认为选中的 1 至 N 条数据：
+仅挑选 platform,version 字段追加数据并去重：combo：'${UNIQ(CONCAT(combo, ARRAYMAP(items, item => {platform: item.platform, version: item.version})))}'
+数据替换并去重：combo：'${UNIQ(ARRAYMAP(items, item => {platform: item.platform, version: item.version}))}'
+数据替换：combo: ${items}
+
+```schema:scope="body"
+{
+  "type": "form",
+  "body": [
+    {
+      "type": "input-text",
+      "label": "浏览器",
+      "name": "browser",
+      "autoFill": {
+        "showSuggestion": true,
+        "api": "/api/mock2/form/autoUpdate?items=1",
+        "multiple": true,
+        "fillMapping": {
+          "combo": "${UNIQ(CONCAT(combo, ARRAYMAP(items, item => {platform: item.platform, version: item.version})))}",
+          "version": "${items[0].version}",
+        },
+        "labelField": "name",
+        "position": "left-bottom-left-top",
+        "trigger": "focus",
+        "mode": "popOver",
+        "size": "md",
+        "filter": {
+          "body": [
+            { "type": "input-text", "name": "platfrom", "label": "平台" },
+            { "type": "input-text", "name": "version", "label": "版本" },
+            { "type": "button-toolbar", "buttons": [{ "type": "submit", "label": "搜索", "level": "primary" }] }
+          ],
+          "wrapWithPanel": false,
+          "mode": "horizontal"
+        },
+        "columns": [
+          { "name": "platform", "label": "平台", "sortable": true },
+          { "name": "version", "label": "版本", "sortable": true }
+        ]
+      }
+    },
+    {
+        type: 'input-text',
+        name: 'version',
+        label: '版本'
+    },
+    {
+        type: 'combo',
+        name: 'combo',
+        strictMode: false,
+        addable: true,
+        multiple: true,
+        label: '版本明细',
+        items: [
+          {
+            name: 'platform',
+            label: '平台',
+            type: 'input-text'
+          },
+          {
+            name: 'version',
+            label: '版本',
+            type: 'input-text'
+          }
+        ]
+    }
+  ]
+}
+```
+
 ## 属性表
 
-| 属性名               | 类型                                               | 默认值    | 说明                                                             |
-| -------------------- | -------------------------------------------------- | --------- | ---------------------------------------------------------------- |
-| type                 | `string`                                           |           | 指定表单项类型                                                   |
-| className            | `string`                                           |           | 表单最外层类名                                                   |
-| inputClassName       | `string`                                           |           | 表单控制器类名                                                   |
-| labelClassName       | `string`                                           |           | label 的类名                                                     |
-| name                 | `string`                                           |           | 字段名，指定该表单项提交时的 key                                 |
-| value                | `string`                                           |           | 表单默认值                                                       |
-| label                | [模板](../../../docs/concepts/template) 或 `false` |           | 表单项标签                                                       |
-| labelAlign           | `"right" \| "left"`                                | `"right"` | 表单项标签对齐方式，默认右对齐，仅在 `mode`为`horizontal` 时生效 |
-| labelRemark          | [Remark](../remark)                                |           | 表单项标签描述                                                   |
-| description          | [模板](../../../docs/concepts/template)            |           | 表单项描述                                                       |
-| placeholder          | `string`                                           |           | 表单项描述                                                       |
-| inline               | `boolean`                                          |           | 是否为 内联 模式                                                 |
-| submitOnChange       | `boolean`                                          |           | 是否该表单项值发生变化时就提交当前表单。                         |
-| disabled             | `boolean`                                          |           | 当前表单项是否是禁用状态                                         |
-| disabledOn           | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                         |
-| visible              | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                         |
-| visibleOn            | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                         |
-| required             | `boolean`                                          |           | 是否为必填。                                                     |
-| requiredOn           | [表达式](../../../docs/concepts/expression)        |           | 过[表达式](../Types.md#表达式)来配置当前表单项是否为必填。       |
-| validations          | [表达式](../../../docs/concepts/expression)        |           | 表单项值格式验证，支持设置多个，多个规则用英文逗号隔开。         |
-| validateApi          | [表达式](../../../docs/types/api)                  |           | 表单校验接口                                                     |
-| autoUpdate           | Object                                             |           | 自动填充配置                                                     |
-| autoUpdate.api       | [api](../../types/api)                             |           | 自动填充数据接口地址                                             |
-| autoUpdate.mapping   | Object                                             |           | 自动填充字段映射关系                                             |
-| autoUpdate.showToast | `boolean`                                          |           | 是否展示数据格式错误提示，默认为 false                           |
+| 属性名                  | 类型                                               | 默认值    | 说明                                                                                                |
+| ----------------------- | -------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| type                    | `string`                                           |           | 指定表单项类型                                                                                      |
+| className               | `string`                                           |           | 表单最外层类名                                                                                      |
+| inputClassName          | `string`                                           |           | 表单控制器类名                                                                                      |
+| labelClassName          | `string`                                           |           | label 的类名                                                                                        |
+| name                    | `string`                                           |           | 字段名，指定该表单项提交时的 key                                                                    |
+| value                   | `string`                                           |           | 表单默认值                                                                                          |
+| label                   | [模板](../../../docs/concepts/template) 或 `false` |           | 表单项标签                                                                                          |
+| labelAlign              | `"right" \| "left"`                                | `"right"` | 表单项标签对齐方式，默认右对齐，仅在 `mode`为`horizontal` 时生效                                    |
+| labelRemark             | [Remark](../remark)                                |           | 表单项标签描述                                                                                      |
+| description             | [模板](../../../docs/concepts/template)            |           | 表单项描述                                                                                          |
+| placeholder             | `string`                                           |           | 表单项描述                                                                                          |
+| inline                  | `boolean`                                          |           | 是否为 内联 模式                                                                                    |
+| submitOnChange          | `boolean`                                          |           | 是否该表单项值发生变化时就提交当前表单。                                                            |
+| disabled                | `boolean`                                          |           | 当前表单项是否是禁用状态                                                                            |
+| disabledOn              | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                                                            |
+| visible                 | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                                                            |
+| visibleOn               | [表达式](../../../docs/concepts/expression)        |           | 当前表单项是否禁用的条件                                                                            |
+| required                | `boolean`                                          |           | 是否为必填。                                                                                        |
+| requiredOn              | [表达式](../../../docs/concepts/expression)        |           | 通过[表达式](../Types.md#表达式)来配置当前表单项是否为必填。                                        |
+| validations             | [表达式](../../../docs/concepts/expression)        |           | 表单项值格式验证，支持设置多个，多个规则用英文逗号隔开。                                            |
+| validateApi             | [表达式](../../../docs/types/api)                  |           | 表单校验接口                                                                                        |
+| autoFill                | [SchemaNode](../../docs/types/schemanode)          |           | 数据录入配置，自动填充或者参照录入                                                                  |
+| autoFill.showSuggestion | `boolean`                                          |           | true 为参照录入，false 自动填充                                                                     |
+| autoFill.api            | [表达式](../../../docs/types/api)                  |           | 自动填充接口/参照录入筛选 CRUD 请求配置                                                             |
+| autoFill.silent         | `boolean`                                          |           | 是否展示数据格式错误提示，默认为 true                                                               |
+| autoFill.fillMappinng   | [SchemaNode](../../docs/types/schemanode)          |           | 自动填充/参照录入数据映射配置，键值对形式，值支持变量获取及表达式                                   |
+| autoFill.trigger        | `string`                                           |           | showSuggestion 为 true 时，参照录入支持的触发方式，目前支持 change「值变化」｜ focus 「表单项聚焦」 |
+| autoFill.mode           | `string`                                           |           | showSuggestion 为 true 时，参照弹出方式 dialog, drawer, popOver                                     |
+| autoFill.labelField     | `string`                                           |           | showSuggestion 为 true 时，设置弹出 dialog,drawer,popOver 中 picker 的 labelField                   |
+| autoFill.position       | `string`                                           |           | showSuggestion 为 true 时，参照录入 mode 为 popOver 时，可配置弹出位置                              |
+| autoFill.size           | `string`                                           |           | showSuggestion 为 true 时，参照录入 mode 为 dialog 时，可设置大小                                   |
+| autoFill.columns        | `Array<Column>`                                    |           | showSuggestion 为 true 时，数据展示列配置                                                           |
+| autoFill.filter         | [SchemaNode](../../docs/types/schemanode)          |           | showSuggestion 为 true 时，数据查询过滤条件                                                         |

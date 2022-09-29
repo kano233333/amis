@@ -37,7 +37,7 @@ class ServerError extends Error {
 export const Column = types
   .model('Column', {
     title: types.optional(types.frozen(), undefined),
-    key: '',
+    name: '',
     toggled: false,
     breakpoint: types.optional(types.frozen(), undefined),
     pristine: types.optional(types.frozen(), undefined),
@@ -52,7 +52,7 @@ export const Column = types
   .actions(self => ({
     toggleToggle() {
       self.toggled = !self.toggled;
-      const table = getParent(self, 2) as ITableStoreV2;
+      const table = getParent(self, 2) as ITableStore2;
 
       if (!table.activeToggaleColumns.length) {
         self.toggled = true;
@@ -65,15 +65,15 @@ export const Column = types
     }
   }));
 
-export type IColumnV2 = Instance<typeof Column>;
-export type SColumnV2 = SnapshotIn<typeof Column>;
+export type IColumn2 = Instance<typeof Column>;
+export type SColumn2 = SnapshotIn<typeof Column>;
 
 export const Row = types
   .model('Row', {
     storeType: 'Row',
     id: types.identifier,
     parentId: '',
-    key: types.string,
+    name: types.string,
     pristine: types.frozen({} as any), // 原始数据
     data: types.frozen({} as any),
     index: types.number,
@@ -87,8 +87,8 @@ export const Row = types
   })
   .views(self => ({
     get checked(): boolean {
-      return (getParent(self, self.depth * 2) as ITableStoreV2).isSelected(
-        self as IRowV2
+      return (getParent(self, self.depth * 2) as ITableStore2).isSelected(
+        self as IRow2
       );
     },
 
@@ -112,9 +112,9 @@ export const Row = types
         children = self.children.map(item => item.locals);
       }
 
-      const parent = getParent(self, 2) as ITableStoreV2;
+      const parent = getParent(self, 2) as ITableStore2;
       return createObject(
-        extendObject((getParent(self, self.depth * 2) as ITableStoreV2).data, {
+        extendObject((getParent(self, self.depth * 2) as ITableStore2).data, {
           index: self.index,
           // todo 以后再支持多层，目前先一层
           parent: parent.storeType === Row.name ? parent.data : undefined
@@ -188,10 +188,10 @@ export const Row = types
     }
   }));
 
-export type IRowV2 = Instance<typeof Row>;
-export type SRowV2 = SnapshotIn<typeof Row>;
+export type IRow2 = Instance<typeof Row>;
+export type SRow2 = SnapshotIn<typeof Row>;
 
-export const TableStoreV2 = ServiceStore.named('TableStoreV2')
+export const TableStore2 = ServiceStore.named('TableStore2')
   .props({
     columns: types.array(Column),
     rows: types.array(Row),
@@ -199,7 +199,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     selectedRows: types.array(types.reference(Row)),
     expandedRowKeys: types.array(types.frozen()),
     columnsTogglable: types.optional(
-      types.union(types.boolean, types.literal('auto')),
+      types.union(types.boolean, types.literal('auto'), types.frozen()),
       'auto'
     ),
     orderBy: '',
@@ -210,7 +210,9 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     query: types.optional(types.frozen(), {}),
     pageNo: 1,
     pageSize: 10,
-    dragging: false
+    dragging: false,
+    keepItemSelectionOnPageChange: false,
+    maxKeepItemSelectionLength: 0
   })
   .views(self => {
     function getToggable() {
@@ -218,7 +220,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
         return self.columns.filter.length > 10;
       }
 
-      return self.columnsTogglable;
+      return !!self.columnsTogglable;
     }
 
     function hasColumnHidden() {
@@ -235,7 +237,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       return getToggableColumns().filter(item => item.toggled);
     }
 
-    function getAllFilteredColumns(columns?: Array<SColumnV2>): Array<any> {
+    function getAllFilteredColumns(columns?: Array<SColumn2>): Array<any> {
       if (columns) {
         return columns
           .filter(
@@ -263,8 +265,8 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     }
 
     function getUnSelectedRows() {
-      return flattenTree<IRowV2>(self.rows).filter(
-        (item: IRowV2) => !item.checked
+      return flattenTree<IRow2>(self.rows).filter(
+        (item: IRow2) => !item.checked
       );
     }
 
@@ -276,7 +278,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       });
     }
 
-    function getRowByIndex(rowIndex: number, levels?: Array<string>): IRowV2 {
+    function getRowByIndex(rowIndex: number, levels?: Array<string>): IRow2 {
       if (levels && levels.length > 0) {
         const index = +(levels.shift() || 0);
         return getRowByIndex(index, levels);
@@ -284,12 +286,12 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       return self.rows[rowIndex];
     }
 
-    function isSelected(row: IRowV2): boolean {
+    function isSelected(row: IRow2): boolean {
       return !!~self.selectedRows.indexOf(row);
     }
 
     function getMovedRows() {
-      return flattenTree(self.rows).filter((item: IRowV2) => item.moved);
+      return flattenTree(self.rows).filter((item: IRow2) => item.moved);
     }
 
     function getMoved() {
@@ -358,9 +360,9 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     };
   })
   .actions(self => {
-    function updateColumns(columns: Array<SColumnV2>) {
+    function updateColumns(columns: Array<SColumn2>) {
       if (columns && Array.isArray(columns)) {
-        let cols: Array<SColumnV2> = columns.filter(column => column).concat();
+        let cols: Array<SColumn2> = columns.filter(column => column).concat();
 
         cols = cols.map((item, index) => ({
           ...item,
@@ -377,7 +379,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       return;
     }
 
-    function update(config: Partial<STableStoreV2>) {
+    function update(config: Partial<STableStore2>) {
       config.columnsTogglable !== void 0 &&
         (self.columnsTogglable = config.columnsTogglable);
 
@@ -388,16 +390,22 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
         );
       }
 
+      config.maxKeepItemSelectionLength !== void 0 &&
+        (self.maxKeepItemSelectionLength = config.maxKeepItemSelectionLength);
+      config.keepItemSelectionOnPageChange !== void 0 &&
+        (self.keepItemSelectionOnPageChange =
+          config.keepItemSelectionOnPageChange);
+
       if (config.columns && Array.isArray(config.columns)) {
         self.columns.replace(updateColumns(config.columns) as any);
       }
     }
 
-    function exchange(fromIndex: number, toIndex: number, item?: IRowV2) {
+    function exchange(fromIndex: number, toIndex: number, item?: IRow2) {
       item = item || self.rows[fromIndex];
 
       if (item.parentId) {
-        const parent: IRowV2 = self.getRowById(item.parentId) as any;
+        const parent: IRow2 = self.getRowById(item.parentId) as any;
         const offset = parent.children.indexOf(item) - fromIndex;
         toIndex += offset;
         fromIndex += offset;
@@ -418,11 +426,25 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       self.rows.replace(newRows);
     }
 
+    function toggleAllColumns() {
+      if (self.activeToggaleColumns.length) {
+        if (self.activeToggaleColumns.length === self.toggableColumns.length) {
+          self.toggableColumns.map(column => column.setToggled(false));
+        } else {
+          self.toggableColumns.map(column => column.setToggled(true));
+        }
+      } else {
+        // 如果没有一个激活的，那就改成全选
+        self.toggableColumns.map(column => column.setToggled(true));
+      }
+      persistSaveToggledColumns();
+    }
+
     function persistSaveToggledColumns() {
       const key =
         location.pathname +
         self.path +
-        self.toggableColumns.map(item => item.key || item.index).join('-');
+        self.toggableColumns.map(item => item.name || item.index).join('-');
       localStorage.setItem(
         key,
         JSON.stringify(self.activeToggaleColumns.map(item => item.index))
@@ -514,7 +536,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     }
 
     // 尽可能的复用 row
-    function replaceRow(arr: Array<SRowV2>, reUseRow?: boolean) {
+    function replaceRow(arr: Array<SRow2>, reUseRow?: boolean) {
       if (reUseRow === false) {
         self.rows.replace(arr.map(item => Row.create(item)));
         return;
@@ -564,7 +586,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
         return {
           id: id,
           parentId,
-          key: String(`${pindex}-${depth}-${index}`),
+          name: String(`${pindex}-${depth}-${index}`),
           path: `${path}${index}`,
           depth: depth,
           index: index,
@@ -590,12 +612,12 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
 
       const key = keyField || 'children';
 
-      let arr: Array<SRowV2> = rows.map((item, index) => {
+      let arr: Array<SRow2> = rows.map((item, index) => {
         let id = getEntryId ? getEntryId(item, index) : guid();
 
         return {
           id: id,
-          key: String(`${index}-1-${index}`),
+          name: String(`${index}-1-${index}`),
           index: index,
           newIndex: index,
           pristine: item,
@@ -659,7 +681,9 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
           );
           throw new ServerError(self.msg);
         } else {
-          self.updateMessage(json.msg ?? options.successMessage);
+          self.updateMessage(
+            json.msg ?? options.successMessage ?? json.defaultMsg
+          );
           self.msg &&
             getEnv(self).notify(
               'success',
@@ -712,6 +736,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
       updateExpanded,
       exchange,
       reset,
+      toggleAllColumns,
 
       // events
       afterCreate() {
@@ -722,7 +747,7 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
           const key =
             location.pathname +
             self.path +
-            self.toggableColumns.map(item => item.key || item.index).join('-');
+            self.toggableColumns.map(item => item.name || item.index).join('-');
 
           const data = localStorage.getItem(key);
 
@@ -738,5 +763,5 @@ export const TableStoreV2 = ServiceStore.named('TableStoreV2')
     };
   });
 
-export type ITableStoreV2 = Instance<typeof TableStoreV2>;
-export type STableStoreV2 = SnapshotIn<typeof TableStoreV2>;
+export type ITableStore2 = Instance<typeof TableStore2>;
+export type STableStore2 = SnapshotIn<typeof TableStore2>;

@@ -377,6 +377,13 @@ export const components = [
         )
       },
       {
+        label: 'InputKVS 键值对象',
+        path: '/zh-CN/components/form/input-kvs',
+        component: React.lazy(() =>
+          import('../../docs/zh-CN/components/form/input-kvs.md').then(wrapDoc)
+        )
+      },
+      {
         label: 'InputFormula 公式编辑器',
         path: '/zh-CN/components/form/input-formula',
         component: React.lazy(() =>
@@ -784,10 +791,10 @@ export const components = [
         )
       },
       // {
-      //   label: 'Table v2 表格',
-      //   path: '/zh-CN/components/table-v2',
+      //   label: 'Table2 表格',
+      //   path: '/zh-CN/components/table2',
       //   component: React.lazy(() =>
-      //     import('../../docs/zh-CN/components/table-v2.md').then(wrapDoc)
+      //     import('../../docs/zh-CN/components/table2.md').then(wrapDoc)
       //   )
       // },
       {
@@ -1139,7 +1146,7 @@ export const components = [
 
 export default class Components extends React.PureComponent<any> {
   componentDidMount() {
-    this.props.setNavigations(components);
+    this.props.setNavigations(components, false);
   }
 
   componentDidUpdate(preProps: any) {
