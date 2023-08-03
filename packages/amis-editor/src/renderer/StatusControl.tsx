@@ -105,7 +105,7 @@ export class StatusControl extends React.Component<
       if (value == trueValue) {
         switch (statusType) {
           case 1:
-            newData[name] = true;
+            newData[name] = trueValue;
             break;
           case 2:
             newData[expressionName] = expression;
